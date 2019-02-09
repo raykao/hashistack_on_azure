@@ -1,0 +1,59 @@
+{
+  "variables": {
+    "subscription_id": "{{env `AZ_SUBSCRIPTION_ID`}}",
+    "tenant_id": "{{env `AZ_TENANT_ID`}}",
+
+    "client_id" : "{{env `AZ_CLIENT_ID`}}",
+    "client_secret": "{{env `AZ_CLIENT_SECRET`}}",
+    
+    "managed_image_name": "{{env `AZ_MANAGED_IMAGE_NAME`}}-{{isotime \"2006-01-02-15h-04m\" }}",
+    "managed_image_resource_group_name": "{{env `AZ_PACKER_RESOURCE_GROUP_NAME`}}",
+    
+    "os_type": "{{env `AZ_OS_TYPE`}}",
+    "image_publisher": "{{env `AZ_IMAGE_PUBLISHER`}}",
+    "image_offer": "{{env `AZ_IMAGE_OFFER`}}",
+    "image_sku": "{{env `AZ_IMAGE_SKU`}}",
+    "location": "{{env `AZ_DC_LOCATION`}}",
+    "vm_size": "{{env `AZ_VM_SIZE`}}",
+
+    "nomad_version": "{{env `NOMAD_VERSION`}}"
+  },
+  "builders": [
+    {
+      "type": "azure-arm",
+      
+      "subscription_id": "{{user `subscription_id`}}",
+      "tenant_id": "{{user `tenant_id`}}",
+
+      "client_id": "{{user `client_id`}}",
+      "client_secret": "{{user `client_secret`}}",
+
+      "managed_image_name": "{{user `managed_image_name`}}",
+      "managed_image_resource_group_name": "{{user `managed_image_resource_group_name`}}",
+     
+      "os_type": "{{user `os_type`}}",
+      "image_publisher": "{{user `image_publisher`}}",
+      "image_offer": "{{user `image_offer`}}",
+      "image_sku": "{{user `image_sku`}}",
+    
+      "azure_tags": {
+        "team": "devops"
+      },
+    
+      "location": "{{user `location`}}",
+      "vm_size": "{{user `vm_size`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "environment_vars": [
+        "NOMAD_VERSION={{user `nomad_version`}}"
+      ],
+      "scripts": [
+        "shell_provisioners/update_system.sh",
+        "shell_provisioners/install_nomad.sh"
+      ]
+    }
+  ]
+}
