@@ -79,6 +79,6 @@ chmod 640 /etc/consul.d/consul.hcl
 cat >/etc/consul.d/consul.hcl <<EOF
 datacenter = "dc1"
 data_dir = "/opt/consul"
-encrypt = "$CONSUL_ENCRYPT"
-retry_join = ["192.168.0.4", "192.168.0.5", "192.168.0.6"]
+# encrypt = "$CONSUL_ENCRYPT"
+# retry_join = ["192.168.0.4", "192.168.0.5", "192.168.0.6"]
 EOF
