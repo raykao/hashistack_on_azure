@@ -2,4 +2,4 @@
 
 sudo apt update
 
-sudo apt install wget unzip
+sudo apt install -y wget unzip jq
