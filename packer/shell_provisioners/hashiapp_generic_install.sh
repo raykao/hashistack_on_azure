@@ -1,7 +1,9 @@
 #!/bin/bash
 
-export HASHIAPPNAME="${hashiapp_name}"
-export HASHIAPP_VERSION="${hashiapp_version}"
+# HASHIAPPNAME Value passed in from packer
+# export HASHIAPPNAME="${hashiapp_name}"
+# export HASHIAPP_VERSION="${hashiapp_version}"
+
 export HASHIAPP_ZIPFILE="$HASHIAPP"$HASHIAPP_VERSION"_linux_amd64.zip"
 export HASHIAPP_DOWNLOAD_PATH="/tmp/"
 export HASHIAPP_DOWNLOAD_URL="https://releases.hashicorp.com/$HASHIAPPNAME/"$HASHIAPP_VERSION"/$HASHIAPP"$HASHIAPP_VERSION"_linux_amd64.zip"

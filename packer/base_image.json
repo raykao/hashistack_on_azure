@@ -18,6 +18,8 @@
 
     "dc_name":"{{env `AZ_DC_NAME`}}",
 
+    "consul_version": "{{env `CONSUL_VERSION`}}",
+    "vault_version": "{{env `VAULT_VERSION`}}",
     "nomad_version": "{{env `NOMAD_VERSION`}}"
   },
   "builders": [
@@ -49,12 +51,38 @@
   "provisioners": [
     {
       "type": "shell",
+      "scripts": [
+        "shell_provisioners/update_system.sh"
+      ]
+    },
+    {
+      "type": "shell",
       "environment_vars": [
-        "NOMAD_VERSION={{user `nomad_version`}}"
+        "HASHIAPPNAME='consul'",
+        "HASHIAPP_VERSION={{user `consul_version`}}"
       ],
       "scripts": [
-        "shell_provisioners/update_system.sh",
-        "shell_provisioners/install_nomad.sh"
+        "shell_provisioners/hashiapp_generic_install.sh"
+      ]
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "HASHIAPPNAME='vault'",
+        "HASHIAPP_VERSION={{user `vault_version`}}"
+      ],
+      "scripts": [
+        "shell_provisioners/hashiapp_generic_install.sh"
+      ]
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "HASHIAPPNAME='nomad'",
+        "HASHIAPP_VERSION={{user `nomad_version`}}"
+      ],
+      "scripts": [
+        "shell_provisioners/hashiapp_generic_install.sh"
       ]
     }
   ]
