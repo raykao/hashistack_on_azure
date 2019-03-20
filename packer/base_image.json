@@ -16,6 +16,8 @@
     "location": "{{env `AZ_DC_LOCATION`}}",
     "vm_size": "{{env `AZ_VM_SIZE`}}",
 
+    "dc_name":"{{env `AZ_DC_NAME`}}",
+
     "nomad_version": "{{env `NOMAD_VERSION`}}"
   },
   "builders": [

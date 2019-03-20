@@ -19,7 +19,7 @@ export AZURE_JWT=$($AZURE_MI_OAUTH | jq ".access_token")
 
 
 consul agent \
-  -config-dir="/etc/config.d" \
-  -data-dir="/opt/consul" \
+  -config-dir="/opt/consul/config" \
+  -data-dir="/opt/consul/data" \
   -encrypt=$CONSUL_GOSSIP_ENCRYPT \
   -retry-join="$CONSUL_SERVERS"

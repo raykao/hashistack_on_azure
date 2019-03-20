@@ -45,3 +45,11 @@ We'll be using Packer to create custom Managed Azure VM images to deploy some se
 ## Docker/Containers
 
 We'll be using Docker containers to package up our applicaiton as a portable applicaton artifact.
+
+## Bootstrap Order
+- Packer - Create image build
+- Terraform - deploy image
+
+- Consul
+- Vault
+- Nomad
