@@ -6,7 +6,6 @@
     "client_id" : "{{env `AZ_CLIENT_ID`}}",
     "client_secret": "{{env `AZ_CLIENT_SECRET`}}",
     
-    "managed_image_name": "{{env `AZ_MANAGED_IMAGE_NAME`}}-{{isotime \"2006-01-02-15h-04m\" }}",
     "managed_image_resource_group_name": "{{env `AZ_PACKER_RESOURCE_GROUP_NAME`}}",
     
     "os_type": "{{env `AZ_OS_TYPE`}}",
@@ -32,7 +31,7 @@
       "client_id": "{{user `client_id`}}",
       "client_secret": "{{user `client_secret`}}",
 
-      "managed_image_name": "{{user `managed_image_name`}}",
+      "managed_image_name": "hashicorpimage-{{isotime | clean_image_name}}",
       "managed_image_resource_group_name": "{{user `managed_image_resource_group_name`}}",
      
       "os_type": "{{user `os_type`}}",
@@ -58,7 +57,7 @@
     {
       "type": "shell",
       "environment_vars": [
-        "HASHIAPPNAME='consul'",
+        "HASHIAPPNAME=consul",
         "HASHIAPP_VERSION={{user `consul_version`}}"
       ],
       "scripts": [
@@ -68,7 +67,7 @@
     {
       "type": "shell",
       "environment_vars": [
-        "HASHIAPPNAME='vault'",
+        "HASHIAPPNAME=vault",
         "HASHIAPP_VERSION={{user `vault_version`}}"
       ],
       "scripts": [
@@ -78,7 +77,7 @@
     {
       "type": "shell",
       "environment_vars": [
-        "HASHIAPPNAME='nomad'",
+        "HASHIAPPNAME=nomad",
         "HASHIAPP_VERSION={{user `nomad_version`}}"
       ],
       "scripts": [

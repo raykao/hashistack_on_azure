@@ -11,9 +11,9 @@ export VAULT_CONFIG_PATH=$VAULT_BASE_PATH"/config"
 export VAULT_DATA_PATH=$VAULT_BASE_PATH"/data"
 
 
-mkdir --parents /opt/vault/config/
-mkdir --parents /opt/vault/data/
-mkdir --parents /opt/vault/bin/
+mkdir --parents $CONSUL_BIN_PATH
+mkdir --parents $CONSUL_CONFIG_PATH
+mkdir --parents $CONSUL_DATA_PATH
 
 wget -p /tmp "$VAULT_URL"
 unzip -d /tmp "$VAULT_DOWNLOAD_PATH$VAULT_ZIPFILE"
