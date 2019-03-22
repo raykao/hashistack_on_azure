@@ -1,0 +1,18 @@
+[Unit]
+Description="HashiCorp Vault - Manage Secrets and Protect Sensitive Data"
+Documentation=https://www.vaultproject.io/
+Requires=network-online.target
+After=network-online.target
+ConditionFileNotEmpty=/opt/vault/config/vault.hcl
+
+[Service]
+User=vault
+Group=vault
+ExecStart=/bin/bash /opt/vault/bin/run_vault.sh
+ExecReload=/usr/local/bin/vault reload
+KillMode=process
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

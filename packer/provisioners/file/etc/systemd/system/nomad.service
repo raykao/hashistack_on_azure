@@ -1,0 +1,18 @@
+[Unit]
+Description="HashiCorp Nomad - Easily Deploy Applications at Any Scale"
+Documentation=https://www.nomadproject.io/
+Requires=network-online.target
+After=network-online.target
+ConditionFileNotEmpty=/opt/nomad/config/nomad.hcl
+
+[Service]
+User=nomad
+Group=nomad
+ExecStart=/bin/bash /opt/nomad/bin/run_nomad.sh
+ExecReload=/usr/local/bin/nomad reload
+KillMode=process
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

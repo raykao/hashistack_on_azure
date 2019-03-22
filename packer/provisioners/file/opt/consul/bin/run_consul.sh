@@ -3,11 +3,15 @@
 # CONSUL_VMSS_RG
 # CONSUL_VMSS_NAME
 # CONSUL_GOSSIP_ENCRYPT_KEY
-## are prepended at provisioning time
+## are prepended at provisioning time with Terraform via custom_data/cloud-init
 
 AZURE_MSI_ENDPOINT="http://169.254.169.254/metadata/identity"
 AZURE_MSI_OAUTH=$(curl -H "Metadata:true" $AZURE_MSI_ENDPOINT"/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fmanagement.azure.com%2F")
 AZURE_MSI_JWT=$(echo $AZURE_MSI_OAUTH | jq -r '.access_token')
+
+CONSUL_BASE_DIR="/opt/consul"
+CONSUL_CONFIG_DIR=$CONSUL_BASE_DIR"/config"
+CONSUL_BIND_ADDR=$(ifconfig eth0 | grep "inet " | awk '{ print $2 }')
 
 function getVMSSprivateIPAddresses () {
   consulRetryJoin=""
@@ -22,5 +26,6 @@ function getVMSSprivateIPAddresses () {
 }
 
 consul agent \
-  -config-dir="/opt/consul/config" \
+  -config-dir="$CONSUL_CONFIG_DIR" \
+  -bind="$CONSUL_BIND_ADDR" \
   $(getVMSSprivateIPAddresses)

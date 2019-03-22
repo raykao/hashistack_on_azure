@@ -49,9 +49,19 @@
   ],
   "provisioners": [
     {
+      "type": "file",
+      "source": "{{template_dir}}/provisioners/file/opt",
+      "destination": "/tmp"
+    },
+    {
+      "type": "file",
+      "source": "{{template_dir}}/provisioners/file/etc",
+      "destination": "/tmp"
+    },
+    {
       "type": "shell",
       "scripts": [
-        "shell_provisioners/update_system.sh"
+        "{{template_dir}}/provisioners/shell/00_update_system.sh"
       ]
     },
     {
@@ -61,27 +71,7 @@
         "HASHIAPP_VERSION={{user `consul_version`}}"
       ],
       "scripts": [
-        "shell_provisioners/hashiapp_generic_install.sh"
-      ]
-    },
-    {
-      "type": "shell",
-      "environment_vars": [
-        "HASHIAPPNAME=vault",
-        "HASHIAPP_VERSION={{user `vault_version`}}"
-      ],
-      "scripts": [
-        "shell_provisioners/hashiapp_generic_install.sh"
-      ]
-    },
-    {
-      "type": "shell",
-      "environment_vars": [
-        "HASHIAPPNAME=nomad",
-        "HASHIAPP_VERSION={{user `nomad_version`}}"
-      ],
-      "scripts": [
-        "shell_provisioners/hashiapp_generic_install.sh"
+        "{{template_dir}}/provisioners/shell/hashiapp_generic_install.sh"
       ]
     }
   ]
