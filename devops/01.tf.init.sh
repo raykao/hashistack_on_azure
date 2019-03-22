@@ -8,7 +8,7 @@
 # export AZUREBLOBSTOREACCESSKEY=""
 # export TFSTATEFILENAME=""
 
-./terraform init \
+terraform init \
   -input=false \
   -backend-config="storage_account_name=$AZUREBLOBSTORAGEACCOUNTNAME" \
   -backend-config="container_name=$AZUREBLOBSTORECONTAINERNAME" \

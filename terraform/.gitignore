@@ -1,6 +1,0 @@
-.terraform/
-*.tfstate
-tfplan
-terraform
-*.zip
-.env
