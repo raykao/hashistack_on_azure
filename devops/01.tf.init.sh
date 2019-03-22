@@ -13,4 +13,5 @@ terraform init \
   -backend-config="storage_account_name=$AZUREBLOBSTORAGEACCOUNTNAME" \
   -backend-config="container_name=$AZUREBLOBSTORECONTAINERNAME" \
   -backend-config="access_key=$AZUREBLOBSTOREACCESSKEY" \
-  -backend-config="key=$TFSTATEFILENAME"
+  -backend-config="key=$TFSTATEFILENAME" \
+  ./terraform

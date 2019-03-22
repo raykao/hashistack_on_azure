@@ -1,3 +1,4 @@
 #!/bin/bash
 
-./terraform refresh
+terraform refresh \
+  ./terraform

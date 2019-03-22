@@ -1,3 +1,5 @@
 #!/bin/bash
 
-./terraform destroy -force
+terraform destroy \
+  -force \
+  ./terraform
