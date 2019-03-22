@@ -46,13 +46,13 @@ sudo chown root:root $SYSTEMD_PATH$HASHIAPPNAME".service"
 echo "*****"
 echo "Hashiapp config files..."
 echo "*****"
-sudo mv "/tmp$HASHIAPP_CONFIG_PATH/*.*" $HASHIAPP_CONFIG_PATH
+sudo mv "/tmp$HASHIAPP_CONFIG_PATH/"* $HASHIAPP_CONFIG_PATH
 
 # Move any run script to Hashiapp base path /opt/<hashiapp_name>/bin
 echo "*****"
 echo "Hashiapp startup/run script..."
 echo "*****"
-sudo mv "/tmp$HASHIAPP_BIN_PATH/*.*" $HASHIAPP_BIN_PATH
+sudo mv "/tmp$HASHIAPP_BIN_PATH/"* $HASHIAPP_BIN_PATH
 
 sudo chown --recursive $HASHIAPP_USER:$HASHIAPP_GROUP $HASHIAPP_BASE_PATH
 

@@ -73,6 +73,26 @@
       "scripts": [
         "{{template_dir}}/provisioners/shell/hashiapp_generic_install.sh"
       ]
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "HASHIAPPNAME=vault",
+        "HASHIAPP_VERSION={{user `vault_version`}}"
+      ],
+      "scripts": [
+        "{{template_dir}}/provisioners/shell/hashiapp_generic_install.sh"
+      ]
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "HASHIAPPNAME=nomad",
+        "HASHIAPP_VERSION={{user `nomad_version`}}"
+      ],
+      "scripts": [
+        "{{template_dir}}/provisioners/shell/hashiapp_generic_install.sh"
+      ]
     }
   ]
 }
