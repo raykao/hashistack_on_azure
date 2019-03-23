@@ -9,14 +9,14 @@ resource "azurerm_virtual_machine_scale_set" "hashicluster" {
   upgrade_policy_mode = "Manual"
 
   sku {
-    name = "${var.instance_size}"
+    name = "${var.cluster_size}"
     tier = "${var.instance_tier}"
     capacity = "${var.cluster_size}"
   }
 
   os_profile {
-    computer_name_prefix = "${var.computer_name_prefix}"
-    admin_username = "${var.admin_user_name}"
+    computer_name_prefix = "hashi"
+    admin_username = "${var.hashiapp}admin"
 
     #This password is unimportant as it is disabled below in the os_profile_linux_config
     admin_password = "Passwword1234"
@@ -43,7 +43,7 @@ resource "azurerm_virtual_machine_scale_set" "hashicluster" {
   }
 
   storage_profile_image_reference {
-    id = "${var.image_id}"
+    id = "${var.vm_image}"
   }
 
   storage_profile_os_disk {
