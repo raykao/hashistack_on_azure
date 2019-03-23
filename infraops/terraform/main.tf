@@ -9,88 +9,55 @@ provider "azurerm" {
   version = "=1.21.0"
 }
 
-resource "azurerm_resource_group" "default" {
-  name     = "${var.AZURE_RESOURCE_GROUP_NAME}"
+resource "azurerm_resource_group" "consul_servers" {
+  name     = "consul-servers"
   location = "${var.AZURE_DC_LOCATION}"
 }
 
-resource "azurerm_container_registry" "default" {
-  name                     = "${azurerm_resource_group.default.name}cr"
-  resource_group_name      = "${azurerm_resource_group.default.name}"
-  location                 = "${azurerm_resource_group.default.location}"
-  sku                      = "Premium"
-  admin_enabled            = true
-  georeplication_locations = ["Canada East"]
+
+resource "azurerm_resource_group" "vault_servers" {
+  name     = "vault-servers"
+  location = "${var.AZURE_DC_LOCATION}"
 }
 
-resource "azurerm_app_service_plan" "default" {
-  name                = "${azurerm_resource_group.default.name}-appserviceplan"
-  location            = "${azurerm_resource_group.default.location}"
-  resource_group_name = "${azurerm_resource_group.default.name}"
-  kind                = "${var.AZURE_APP_SERVICE_PLAN_KIND}"
-
-  reserved = "${var.AZURE_APP_SERVICE_PLAN_RESERVED}"
-
-  sku {
-    tier = "${var.AZURE_APP_SERVICE_PLAN_TIER}"
-    size = "${var.AZURE_APP_SERVICE_PLAN_SIZE}"
-  }
+resource "azurerm_resource_group" "nomad_servers" {
+  name     = "nomad-servers"
+  location = "${var.AZURE_DC_LOCATION}"
 }
 
-# Create an Azure Web App for Containers in that App Service Plan
-resource "azurerm_app_service" "webapp" {
-  name                = "${azurerm_resource_group.default.name}wafcweb"
-  location            = "${azurerm_resource_group.default.location}"
-  resource_group_name = "${azurerm_resource_group.default.name}"
-  app_service_plan_id = "${azurerm_app_service_plan.default.id}"
-
-  # Do not attach Storage by default
-  app_settings {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = false
-
-    # Settings for private Container Registires  
-    DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.default.login_server}"
-    DOCKER_REGISTRY_SERVER_USERNAME = "${azurerm_container_registry.default.admin_username}"
-    DOCKER_REGISTRY_SERVER_PASSWORD = "${azurerm_container_registry.default.admin_password}"
-  }
-
-  # Configure Docker Image to load on start
-  site_config {
-    linux_fx_version = "DOCKER|${azurerm_container_registry.default.login_server}/${var.WEBAPP_CONTAINER_IMAGE_NAME}:${var.WEBAPP_CONTAINER_IMAGE_TAG}"
-    always_on        = "true"
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
+resource "azurerm_resource_group" "hashi_cluster" {
+  name     = "hashi-cluster"
+  location = "${var.AZURE_DC_LOCATION}"
 }
 
+module "consul_servers" {
+  source = "./modules/hashi-cluster"
+  vm_size = "Standard_D2_v3"
+  resource_group = "${azurerm_resource_group.consul_servers.name}"
+  location = "${azurerm_resource_group.consul_servers.location}"
+  cluster_size = 3
+}
 
-# Create an Azure Web App for Containers in that App Service Plan
-resource "azurerm_app_service" "apiapp" {
-  name                = "${azurerm_resource_group.default.name}wafcapi"
-  location            = "${azurerm_resource_group.default.location}"
-  resource_group_name = "${azurerm_resource_group.default.name}"
-  app_service_plan_id = "${azurerm_app_service_plan.default.id}"
+module "vault_servers" {
+  source = "./modules/hashi-cluster"
+  vm_size = "Standard_D2_v3"
+  resource_group = "${azurerm_resource_group.vault_servers.name}"
+  location = "${azurerm_resource_group.vault_servers.location}"
+  cluster_size = 3
+}
 
-  # Do not attach Storage by default
-  app_settings {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = false
+module "nomad_servers" {
+  source = "./modules/hashi-cluster"
+  vm_size = "Standard_D2_v3"
+  resource_group = "${azurerm_resource_group.nomad_servers.name}"
+  location = "${azurerm_resource_group.nomad_servers.location}"
+  cluster_size = 3
+}
 
-    # Settings for private Container Registires  
-    DOCKER_REGISTRY_SERVER_URL      = "https://${azurerm_container_registry.default.login_server}"
-    DOCKER_REGISTRY_SERVER_USERNAME = "${azurerm_container_registry.default.admin_username}"
-    DOCKER_REGISTRY_SERVER_PASSWORD = "${azurerm_container_registry.default.admin_password}"
-    MONGODB_CONNECTION_STRING = "${var.MONGODB_CONNECTION_STRING}"
-  }
-
-  # Configure Docker Image to load on start
-  site_config {
-    linux_fx_version = "DOCKER|${azurerm_container_registry.default.login_server}/${var.APIAPP_CONTAINER_IMAGE_NAME}:${var.APIAPP_CONTAINER_IMAGE_TAG}"
-    always_on        = "true"
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
+module "hashi_cluster" {
+  source = "./modules/hashi-cluster"
+  vm_size = "Standard_D2_v3"
+  resource_group = "${azurerm_resource_group.hashi_cluster.name}"
+  location = "${azurerm_resource_group.hashi_cluster.location}"
+  cluster_size = 10
 }
