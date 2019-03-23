@@ -1,3 +1,8 @@
+variable "CLUSTER_ENVIRONMENT" {
+  default = "test"
+}
+
+
 variable "AZURE_RESOURCE_GROUP_NAME" {
   default = "rkdevopsdemo"
 }
