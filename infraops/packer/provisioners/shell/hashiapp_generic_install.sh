@@ -40,6 +40,7 @@ echo $(ls /tmp/etc/systemd/system)
 echo "Moving systemd file..."
 echo "*****"
 sudo mv "/tmp"$SYSTEMD_PATH$HASHIAPPNAME".service" $SYSTEMD_PATH
+sudo chmod a+x $SYSTEMD_PATH$HASHIAPPNAME".service"
 sudo chown root:root $SYSTEMD_PATH$HASHIAPPNAME".service"
 
 # Move Hashiapp <hashiapp> *.hcl *.json config files to Hashiapp config base path /opt/<hashiapp_name>/config
