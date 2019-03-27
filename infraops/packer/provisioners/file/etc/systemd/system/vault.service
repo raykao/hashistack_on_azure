@@ -1,6 +1,6 @@
 [Unit]
-Description="HashiCorp Vault - Manage Secrets and Protect Sensitive Data"
-Documentation=https://www.vaultproject.io/
+Description="HashiCorp Vault - A tool for managing secrets"
+Documentation=https://www.vaultproject.io/docs/
 Requires=network-online.target
 After=network-online.target
 ConditionFileNotEmpty=/opt/vault/config/vault.hcl
@@ -8,10 +8,24 @@ ConditionFileNotEmpty=/opt/vault/config/vault.hcl
 [Service]
 User=vault
 Group=vault
-ExecStart=/bin/bash /opt/vault/bin/run_vault.sh
-ExecReload=/usr/local/bin/vault reload
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=yes
+PrivateDevices=yes
+SecureBits=keep-caps
+AmbientCapabilities=CAP_IPC_LOCK
+Capabilities=CAP_IPC_LOCK+ep
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+NoNewPrivileges=yes
+ExecStart=/usr/local/bin/vault server -config=/opt/vault/config/vault.default.hcl
+ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
+KillSignal=SIGINT
 Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+StartLimitIntervalSec=60
+StartLimitBurst=3
 LimitNOFILE=65536
 
 [Install]
