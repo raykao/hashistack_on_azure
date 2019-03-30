@@ -1,2 +1,9 @@
 .terraform
 .cheatsheet.sh
+*.tfstate*
+.terraform/
+*.tfstate
+tfplan
+terraform
+*.zip
+.env
