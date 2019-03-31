@@ -12,7 +12,6 @@ data "azurerm_subscription" "primary" {}
 locals {
   prefix = "${random_string.prefix.result}"
   consul_encrypt = "${var.CONSUL_GOSSIP_ENCRYPT_KEY != "" ? var.CONSUL_GOSSIP_ENCRYPT_KEY : base64encode(random_string.consul_encrypt.result)}"
-
 }
 
 resource "random_string" "consul_encrypt" {

@@ -19,7 +19,9 @@
 
     "consul_version": "{{env `CONSUL_VERSION`}}",
     "vault_version": "{{env `VAULT_VERSION`}}",
-    "nomad_version": "{{env `NOMAD_VERSION`}}"
+    "nomad_version": "{{env `NOMAD_VERSION`}}",
+
+    "docker_version_string": "{{env 'DOCKER_VERSION_STRING'}}"
   },
   "builders": [
     {
@@ -92,6 +94,15 @@
       ],
       "scripts": [
         "{{template_dir}}/provisioners/shell/hashiapp_generic_install.sh"
+      ]
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "DOCKER_VERSION_STRING={{user `docker_version_string`}}"
+      ],
+      "scripts": [
+        "{{template_dir}}/provisioners/shell/install_docker.sh"
       ]
     }
   ]

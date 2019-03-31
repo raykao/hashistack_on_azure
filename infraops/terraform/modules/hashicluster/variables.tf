@@ -20,7 +20,7 @@ variable "cluster_name" {
 }
 
 variable "cluster_type" {
-  default = "worker"
+  default = ""
 }
 
 variable "cluster_vm_size" {
@@ -32,7 +32,7 @@ variable "cluster_vm_count" {
 }
 
 variable "hashiapp" {
-  default = "worker"
+  default = ""
 }
 
 variable "admin_user_name" {
