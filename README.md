@@ -64,6 +64,4 @@ export TF_VAR_CLUSTER_ENVIRONMENT=""
 export TF_VAR_HASHI_MANAGED_VM_IMAGE_NAME=""
 export TF_VAR_ADMIN_NAME=""
 export TF_VAR_SSH_PUBLIC_KEY="$(cat ~/.ssh/id_rsa.pub)"
-export TF_VAR_MSI_ID=""
-export TF_VAR_MSI_SECRET=""
 ```
