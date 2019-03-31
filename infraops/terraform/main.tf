@@ -11,12 +11,6 @@ data "azurerm_subscription" "primary" {}
 
 locals {
   prefix = "${random_string.prefix.result}"
-  consul_encrypt = "${var.CONSUL_GOSSIP_ENCRYPT_KEY != "" ? var.CONSUL_GOSSIP_ENCRYPT_KEY : base64encode(random_string.consul_encrypt.result)}"
-}
-
-resource "random_string" "consul_encrypt" {
-  length = 16
-  special = false
 }
 
 resource "random_string" "prefix" {
@@ -212,6 +206,8 @@ module "consul_servers" {
   msi_id = "${azurerm_user_assigned_identity.consul-vmss-reader.id}"
 
   subnet_id = "${azurerm_subnet.consul-server-subnet.id}"
+
+  consul_encrypt
 }
 
 # module "vault_servers" {

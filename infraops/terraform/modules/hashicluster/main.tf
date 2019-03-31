@@ -6,32 +6,21 @@ provider "azuread" {
   version = "=0.1.0"
 }
 
+locals {
+  consul_encrypt_key = "${var.consul_encrypt_key ? var.consul_encrypt_key : base64encode(string)}"
+}
 
 data "template_file" "consul" {
   template = "${file("${path.module}/scripts/consul/config_consul_server.sh")}"
   vars = {
-    subscription_id = "${data.azurerm_subscription.primary.id}"
-        
+    is_server = "${var.hashiapp}"    
+    azure_subscription_id = "${data.azurerm_subscription.primary.id}"
     consul_vmss_name = "${var.consul_vmss_name}"
     consul_vmss_rg = "${var.consul_vmss_rg}"
-    consul_encrypt = "${local.consul_encrypt}"
-
-    consul_server = "${local.consul_server}"
-    vault_server = "${local.vault_server}"
-    nomad_server = "${local.nomad_server}"
+    consul_dc_name = "${var.consul_dc_name}"
+    consul_encrypt_key = "${local.consul_encrypt_key}"
   }
 }
-
-locals {
-  consul_encrypt = "${var.consul_encrypt ? var.consul_encrypt : base64encode(string)}"
-  cluster_name = "${var.hashiapp != "consul" && var.hashiapp == "consul" ? "true" : ""}"
-  consul_server = "${var.cluster_type != "worker" && var.hashiapp == "consul" ? "true" : ""}"
-  vault_server = "${var.cluster_type  !="worker" && var.hashiapp == "vault" ? "true" : ""}" 
-  nomad_server = "${var.cluster_type  !="worker" && var.hashiapp == "nomad" ? "true" : ""}" 
-  
-
-}
-
 
 resource "azurerm_virtual_machine_scale_set" "hashicluster" {
   name = "${var.cluster_name}"

@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Terraform variables will be "injected" via interpolation and data source configuration in main template
-export AZURE_SUBSCRIPTION_ID="${subscription_id}"
-export IS_SERVER="${hashiapp}"
+export IS_SERVER="${is_server}"
+export AZURE_SUBSCRIPTION_ID="${azure_subscription_id}"
 export CONSUL_VMSS_NAME="${consul_vmss_name}"
 export CONSUL_VMSS_RG="${consul_vmss_rg}"
 export CONSUL_DC_NAME="${consul_dc_name}"
-export CONSUL_GOSSIP_ENCRYPT_KEY="${consul_encrpyt}"
+export CONSUL_ENCRYPT_KEY="${consul_encrypt_key}"
 
 ###############################
 ### Server or Worker setup ####
@@ -70,7 +70,7 @@ configure_consul_agent() {
   ## Add Consul default settings to all worker and all server types (Consul, Vault, Nomad)
 sudo cat >/opt/consul/config/consul.hcl <<EOF
   datacenter = "$CONSUL_DC_NAME"
-  encrypt = "$CONSUL_GOSSIP_ENCRYPT_KEY"
+  encrypt = "$CONSUL_ENCRYPT_KEY"
   data_dir = "/opt/consul/data"
 EOF
 

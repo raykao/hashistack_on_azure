@@ -51,3 +51,22 @@ variable "msi_id" {
   
 }
 
+variable "consul_encrypt_key" {
+  default = ""
+}
+
+variable "consul_dc_name" {
+  default = "dc1"
+}
+
+variable "consul_vmss_name" {
+  
+}
+
+
+variable "consul_vmss_rg" {
+  
+}
+
+
+
