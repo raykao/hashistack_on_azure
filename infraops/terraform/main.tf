@@ -22,7 +22,7 @@ resource "random_string" "prefix" {
 
 
 resource "azurerm_resource_group" "hashi_cluster" {
-  name     = "hashi-cluster"
+  name     = "hashicluster-shared"
   location = "${var.AZURE_DC_LOCATION}"
 }
 
@@ -31,7 +31,6 @@ resource "azurerm_resource_group" "consul_servers" {
   location = "${var.AZURE_DC_LOCATION}"
   tags = {
       hashi = "consul"
-      consul = "server"
     }
 }
 
@@ -40,7 +39,6 @@ resource "azurerm_resource_group" "vault_servers" {
   location = "${var.AZURE_DC_LOCATION}"
   tags = {
       hashi = "vault"
-      vault = "server"
     }
 }
 
@@ -49,31 +47,46 @@ resource "azurerm_resource_group" "nomad_servers" {
   location = "${var.AZURE_DC_LOCATION}"
   tags = {
       hashi = "nomad"
-      nomad = "server"
     }
 }
 
-resource "azurerm_resource_group" "hashi_worker_general_cluster001" {
-  name     = "hashi-worker-general-cluster001"
+resource "azurerm_resource_group" "hashiworker_general_cluster001" {
+  name     = "hashiworker-general-001"
   location = "${var.AZURE_DC_LOCATION}"
+  tags = {
+    hashi = "worker"
+  }
 }
 
-resource "azurerm_resource_group" "hashi_bastion_servers" {
-  name = "hashi-bastion-servers"
+resource "azurerm_resource_group" "jumpbox-server" {
+  name = "jumpbox-servers"
   location = "${var.AZURE_DC_LOCATION}"
+  tags = {
+    hashi = "jumpbox-server"
+  }
 }
 
 resource "azurerm_user_assigned_identity" "consul-vmss-reader" {
+  count = "${var.MSI_ID == "" ? 1 : 0}"
   resource_group_name = "${azurerm_resource_group.hashi_cluster.name}"
   location            = "${azurerm_resource_group.hashi_cluster.location}"
 
   name = "consul-vmss-reader"
+
+  tags = {
+    hashi = "vmssreader"
+  }
 }
 
 resource "azurerm_role_assignment" "test" {
+  count = "${var.MSI_ID == "" ? 1 : 0}"
   scope                = "${data.azurerm_subscription.primary.id}"
   role_definition_name = "Reader"
   principal_id         = "${azurerm_user_assigned_identity.consul-vmss-reader.principal_id}"
+  
+  tags = {
+    hashi = "vmssreader"
+  }
 }
 
 
@@ -90,45 +103,45 @@ resource "azurerm_virtual_network" "hashi_net" {
 }
 
 resource "azurerm_subnet" "consul-server-subnet" {
-  name           = "${azurerm_resource_group.vault_servers.name}-subnet"
+  name           = "${azurerm_resource_group.consul_servers.name}-subnet"
   resource_group_name  = "${azurerm_resource_group.hashi_cluster.name}"
   virtual_network_name = "${azurerm_virtual_network.hashi_net.name}"
   address_prefix = "10.0.0.0/28"
 }
 
 resource "azurerm_subnet" "vault-server-subnet" {
-  name           = "${azurerm_resource_group.nomad_servers.name}-subnet"
+  name           = "${azurerm_resource_group.vault_servers.name}-subnet"
   resource_group_name  = "${azurerm_resource_group.hashi_cluster.name}"
   virtual_network_name = "${azurerm_virtual_network.hashi_net.name}"
   address_prefix = "10.0.0.16/28"
 }
 
 resource "azurerm_subnet" "nomad-server-subnet" {
-  name           = "${azurerm_resource_group.hashi_bastion_servers.name}-subnet"
+  name           = "${azurerm_resource_group.nomad_servers.name}-subnet"
   resource_group_name  = "${azurerm_resource_group.hashi_cluster.name}"
   virtual_network_name = "${azurerm_virtual_network.hashi_net.name}"
   address_prefix = "10.0.0.32/28"
 }
 
 resource "azurerm_subnet" "jumpbox-subnet" {
-  name           = "jumpbox-subnet"
+  name           = "${azurerm_resource_group.jumpbox-server.name}-subnet"
   resource_group_name  = "${azurerm_resource_group.hashi_cluster.name}"
   virtual_network_name = "${azurerm_virtual_network.hashi_net.name}"
   address_prefix = "10.0.0.48/29"
 }
 
 
-resource "azurerm_subnet" "hashi_worker_general_cluster001-subnet" {
-  name           = "${azurerm_resource_group.hashi_worker_general_cluster001.name}-subnet"
+resource "azurerm_subnet" "hashiworker_general_cluster001-subnet" {
+  name           = "${azurerm_resource_group.hashiworker_general_cluster001.name}-subnet"
   resource_group_name  = "${azurerm_resource_group.hashi_cluster.name}"
   virtual_network_name = "${azurerm_virtual_network.hashi_net.name}"
   address_prefix = "10.1.0.0/17"
 }
 
-resource "azurerm_public_ip" "jumpbox" {
+resource "azurerm_public_ip" "jumpbox-server" {
   name                = "jumpbox-pip"
-  location            = "${azurerm_resource_group.hashi_cluster.location}"
-  resource_group_name = "${azurerm_resource_group.hashi_cluster.name}"
+  location            = "${azurerm_resource_group.jumpbox-server.location}"
+  resource_group_name = "${azurerm_resource_group.jumpbox-server.name}"
   allocation_method   = "Dynamic"
   idle_timeout_in_minutes = 30
   domain_name_label = "${local.prefix}"
@@ -138,24 +151,24 @@ resource "azurerm_public_ip" "jumpbox" {
   }
 }
 
-resource "azurerm_network_interface" "jumpbox" {
+resource "azurerm_network_interface" "jumpbox-server" {
   name                = "jumpbox-nic"
-  location            = "${azurerm_resource_group.hashi_cluster.location}"
-  resource_group_name = "${azurerm_resource_group.hashi_cluster.name}"
+  location            = "${azurerm_resource_group.jumpbox-server.location}"
+  resource_group_name = "${azurerm_resource_group.jumpbox-server.name}"
 
   ip_configuration {
     name                          = "jumpboxconfiguration"
     subnet_id                     = "${azurerm_subnet.jumpbox-subnet.id}"
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = "${azurerm_public_ip.jumpbox.id}"
+    public_ip_address_id          = "${azurerm_public_ip.jumpbox-server.id}"
   }
 }
 
-resource "azurerm_virtual_machine" "jumpbox" {
+resource "azurerm_virtual_machine" "jumpbox-server" {
   name                  = "jumpboxvm"
-  location              = "${azurerm_resource_group.hashi_cluster.location}"
-  resource_group_name   = "${azurerm_resource_group.hashi_cluster.name}"
-  network_interface_ids = ["${azurerm_network_interface.jumpbox.id}"]
+  location              = "${azurerm_resource_group.jumpbox-server.location}"
+  resource_group_name   = "${azurerm_resource_group.jumpbox-server.name}"
+  network_interface_ids = ["${azurerm_network_interface.jumpbox-server.id}"]
   vm_size               = "Standard_DS1_v2"
 
   storage_image_reference {
@@ -188,26 +201,26 @@ resource "azurerm_virtual_machine" "jumpbox" {
 
 module "consul_servers" {
   source = "./modules/hashicluster"
-  cluster_name = "${azurerm_resource_group.consul_servers.name}"
+  
+  hashiapp = "consul"
+  cluster_name = "${var.CONSUL_VMSS_NAME}"
+  
+  consul_vmss_name = "${var.CONSUL_VMSS_NAME}"
+  consul_vmss_rg = "${azurerm_resource_group.consul_servers.name}"
+  consul_encrypt_key = "${var.CONSUL_ENCRYPT_KEY}"
 
+  msi_id = "${azurerm_user_assigned_identity.consul-vmss-reader.id}"
   cluster_vm_count = "${var.CONSUL_SERVER_CLUSTER_VM_COUNT}"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"
-  cluster_type = "server"
-  hashiapp = "consul"
+  cluster_vm_image_reference = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
 
   resource_group_name = "${azurerm_resource_group.consul_servers.name}"
   resource_group_location = "${azurerm_resource_group.consul_servers.location}"
   
-  cluster_vm_image_reference = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
-
   admin_user_name = "${var.ADMIN_NAME}"
   ssh_public_key = "${var.SSH_PUBLIC_KEY}"
 
-  msi_id = "${azurerm_user_assigned_identity.consul-vmss-reader.id}"
-
   subnet_id = "${azurerm_subnet.consul-server-subnet.id}"
-
-  consul_encrypt
 }
 
 # module "vault_servers" {

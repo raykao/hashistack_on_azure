@@ -14,7 +14,7 @@ data "template_file" "consul" {
   template = "${file("${path.module}/scripts/consul/config_consul_server.sh")}"
   vars = {
     is_server = "${var.hashiapp}"    
-    azure_subscription_id = "${data.azurerm_subscription.primary.id}"
+    azure_subscription_id = "${var.azure_subscription_id}"
     consul_vmss_name = "${var.consul_vmss_name}"
     consul_vmss_rg = "${var.consul_vmss_rg}"
     consul_dc_name = "${var.consul_dc_name}"
