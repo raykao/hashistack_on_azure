@@ -11,6 +11,7 @@ data "azurerm_subscription" "primary" {}
 
 locals {
   prefix = "${random_string.prefix.result}"
+  consul_vmss_name = "consul-servers"
 }
 
 resource "random_string" "prefix" {
@@ -203,9 +204,9 @@ module "consul_servers" {
   source = "./modules/hashicluster"
   
   hashiapp = "consul"
-  cluster_name = "${var.CONSUL_VMSS_NAME}"
+  cluster_name = "${local.consul_vmss_name}"
   
-  consul_vmss_name = "${var.CONSUL_VMSS_NAME}"
+  consul_vmss_name = "${local.consul_vmss_name}"
   consul_vmss_rg = "${azurerm_resource_group.consul_servers.name}"
   consul_encrypt_key = "${var.CONSUL_ENCRYPT_KEY}"
 

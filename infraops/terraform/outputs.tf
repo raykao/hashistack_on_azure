@@ -1,5 +1,5 @@
-output "consul_encrypt" {
-  value = "${local.consul_encrypt}"
+output "consul_encrypt_key" {
+  value = "${module.consul_servers.consul_encrypt_key}"
 }
 
 output "consul_reader_msi" {

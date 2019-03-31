@@ -1,31 +1,29 @@
 variable "azure_subscription_id" {
   default = ""
+  description = "Azure subscription to deploy into"
 }
 
 
 variable "cluster_vm_image_reference" {
-  
+  description = "The Managed Image reference URI."
 }
 
 variable "ssh_public_key" {
-  
+  description = "The SSH key to install for the default system admin."
 }
 
 
 variable "subnet_id" {
-  
+  description = "The subnet to deploy the cluster into."
 }
 
 variable "associate_public_ip_address_load_balancer" {
+  description = "Should a load balancer be deployed? Default: Nope."
   default = false
 }
 
 variable "cluster_name" {
   default = "hashiworkercluster"
-}
-
-variable "cluster_type" {
-  default = ""
 }
 
 variable "cluster_vm_size" {
@@ -62,6 +60,7 @@ variable "consul_encrypt_key" {
 }
 
 variable "consul_dc_name" {
+  description = "The name of the Consul DC being deployed."
   default = "dc1"
 }
 

@@ -38,12 +38,3 @@ variable "CONSUL_ENCRYPT_KEY" {
   default = ""
 }
 
-variable "CONSUL_VMSS_NAME" {
-  
-}
-
-variable "CONSUL_VMSS_RG" {
-  
-}
-
-

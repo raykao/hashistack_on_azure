@@ -7,7 +7,7 @@ output "consul_vmss_rg" {
 }
 
 output "consul_encrypt_key" {
-  value = "${local.consul_encrypt}"
+  value = "${local.consul_encrypt_key}"
 }
 
 output "msi_id" {

@@ -6,11 +6,17 @@ provider "azuread" {
   version = "=0.1.0"
 }
 
-locals {
-  consul_encrypt_key = "${var.consul_encrypt_key ? var.consul_encrypt_key : base64encode(string)}"
+resource "random_string" "consul_encrypt" {
+  length = 16
+  special = false
 }
 
-data "template_file" "consul" {
+locals {
+  auto_generate_key = "${base64encode(random_string.consul_encrypt.result)}"
+  consul_encrypt_key = "${var.consul_encrypt_key != "" ? var.consul_encrypt_key : local.auto_generate_key}"
+}
+
+data "template_file" "hashiconfig" {
   template = "${file("${path.module}/scripts/consul/config_consul_server.sh")}"
   vars = {
     is_server = "${var.hashiapp}"    
@@ -42,6 +48,7 @@ resource "azurerm_virtual_machine_scale_set" "hashicluster" {
   os_profile {
     computer_name_prefix = "hashi${var.hashiapp}"
     admin_username = "${var.admin_user_name}"
+    custom_data = "${data.template_file.hashiconfig.rendered}"
   }
 
   os_profile_linux_config {
