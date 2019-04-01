@@ -35,7 +35,7 @@ enable_hashiapp() {
 #############################
 configure_consul_agent() {
   # At terraform provisioning time, Azure Subscription ID, VMSS Name && RG values are written to the /opt/consul/bin/run_consul.sh script which systemd.service uses to boot Consul at Start/Restart. These values are needed to auto check the Consul Server VMSS cluster ip addresses for dynamic retry joining via Azure Manages Service Identity assigned to the VM.  Consul Server Cluster IP addresses can by dynamic and change as a result of auto/manual scaling of Server Nodes.  We need to run this dynamically on boot to ensure we find at least 1 known good IP address to join to the Consul Cluster.
-  sudo echo -e "AZURE_SUBSCRIPTION_ID='$AZURE_SUBSCRIPTION_ID'\nCONSUL_VMSS_RG='$CONSUL_VMSS_RG'\nCONSUL_VMSS_NAME='$CONSUL_VMSS_NAME')" | sudo cat - /opt/consul/bin/run_consul.sh > temp | sudo mv temp /opt/consul/bin/run_consul.sh
+  sudo echo -e "AZURE_SUBSCRIPTION_ID='$AZURE_SUBSCRIPTION_ID'\nCONSUL_VMSS_RG='$CONSUL_VMSS_RG'\nCONSUL_VMSS_NAME='$CONSUL_VMSS_NAME'" | sudo cat - /opt/consul/bin/run_consul.sh > temp | sudo mv temp /opt/consul/bin/run_consul.sh
 
   ## Add Consul default settings to all worker and all server types (Consul, Vault, Nomad)
   sudo echo -e "datacenter = \"$CONSUL_DC_NAME\"\nencrypt = \"$CONSUL_ENCRYPT_KEY\"\ndata_dir = \"/opt/consul/data\""  | sudo tee /opt/consul/config/consul.hcl

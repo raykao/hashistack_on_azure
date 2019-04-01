@@ -17,11 +17,11 @@ CONSUL_BIND_ADDR=$(ifconfig eth0 | grep "inet " | awk '{ print $2 }')
 
 function getVMSSprivateIPAddresses () {
   consulRetryJoin=""
-  vmssPrivateIPAddress=$(curl https://management.azure.com/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/$CONSUL_VMSS_RG/providers/Microsoft.Compute/virtualMachineScaleSets/$CONSUL_VMSS_NAME/networkInterfaces?api-version=2018-10-01 -H "Authorization: Bearer $AZURE_MSI_JWT" | jq -r '.value | .[] | .properties.ipConfigurations | .[] | .properties.privateIPAddress')
+  vmssPrivateIPAddress=$(curl https://management.azure.com$AZURE_SUBSCRIPTION_ID/resourceGroups/$CONSUL_VMSS_RG/providers/Microsoft.Compute/virtualMachineScaleSets/$CONSUL_VMSS_NAME/networkInterfaces?api-version=2018-10-01 -H "Authorization: Bearer $AZURE_MSI_JWT" | jq -r '.value | .[] | .properties.ipConfigurations | .[] | .properties.privateIPAddress')
 
   for vmIP in $vmssPrivateIPAddress
   do
-    consulRetryJoin+=' -retry-join='$vmIP
+    consulRetryJoin+=' -retry-join="'$vmIP'"'
   done
 
   echo $consulRetryJoin
