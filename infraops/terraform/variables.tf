@@ -3,12 +3,21 @@ variable "CLUSTER_ENVIRONMENT" {
 }
 
 variable "AZURE_RESOURCE_GROUP_NAME" {
-  default = "hashi-cluster"
+  default = "hashicluster"
 }
 
 variable "AZURE_DC_LOCATION" {
   default = "Canada Central"
 }
+
+variable "CONSUL_VMSS_NAME" {
+  default = "consul-server"
+}
+
+variable "CONSUL_VMSS_RG" {
+  default = "consul-server"
+}
+
 
 variable "CONSUL_SERVER_CLUSTER_VM_COUNT" {
   default = 3
@@ -23,7 +32,7 @@ variable "HASHI_MANAGED_VM_IMAGE_NAME" {
 }
 
 variable "MSI_ID" {
-  
+  default = ""
 }
 
 variable "ADMIN_NAME" {
@@ -31,7 +40,7 @@ variable "ADMIN_NAME" {
 }
 
 variable "SSH_PUBLIC_KEY" {
-  
+  description = "Required - needed to log into server"
 }
 
 variable "CONSUL_ENCRYPT_KEY" {

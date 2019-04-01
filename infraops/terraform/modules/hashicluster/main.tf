@@ -2,12 +2,17 @@ terraform {
   required_version = ">= 0.11.11"
 }
 
-provider "azuread" {
-  version = "=0.1.0"
-}
+data "azurerm_subscription" "primary" {}
+
 
 resource "random_string" "consul_encrypt" {
   length = 16
+  special = false
+}
+
+resource "random_string" "msi_name" {
+  length = 8
+  number = false
   special = false
 }
 
@@ -16,11 +21,12 @@ locals {
   consul_encrypt_key = "${var.consul_encrypt_key != "" ? var.consul_encrypt_key : local.auto_generate_key}"
 }
 
+
 data "template_file" "hashiconfig" {
   template = "${file("${path.module}/scripts/consul/config_consul_server.sh")}"
   vars = {
     is_server = "${var.hashiapp}"    
-    azure_subscription_id = "${var.azure_subscription_id}"
+    azure_subscription_id = "${data.azurerm_subscription.primary.id}"
     consul_vmss_name = "${var.consul_vmss_name}"
     consul_vmss_rg = "${var.consul_vmss_rg}"
     consul_dc_name = "${var.consul_dc_name}"
@@ -28,21 +34,54 @@ data "template_file" "hashiconfig" {
   }
 }
 
+resource "azurerm_resource_group" "hashicluster" {
+  name     = "${var.resource_group_name}"
+  location = "${var.resource_group_location}"
+  tags = {
+      hashiapp = "${var.hashiapp}"
+    }
+}
+
+resource "azurerm_subnet" "hashicluster" {
+  name           = "${var.cluster_name}-subnet"
+  virtual_network_name = "${var.vnet_name}"
+  resource_group_name  = "${var.vnet_resource_group_name}"
+  address_prefix = "${var.subnet_prefix}"
+}
+
+
+resource "azurerm_user_assigned_identity" "consul-vmss-reader" {
+  resource_group_name = "${azurerm_resource_group.hashicluster.name}"
+  location            = "${azurerm_resource_group.hashicluster.location}"
+
+  name = "${var.hashiapp}-${random_string.msi_name.result}-msi"
+
+  tags = {
+    hashi = "vmssreader"
+  }
+}
+
+resource "azurerm_role_assignment" "test" {
+  scope                = "${data.azurerm_subscription.primary.id}"
+  role_definition_name = "Reader"
+  principal_id         = "${azurerm_user_assigned_identity.consul-vmss-reader.principal_id}"
+}
+
 resource "azurerm_virtual_machine_scale_set" "hashicluster" {
   name = "${var.cluster_name}"
-  resource_group_name = "${var.resource_group_name}"
-  location = "${var.resource_group_location}"
+  resource_group_name = "${azurerm_resource_group.hashicluster.name}"
+  location = "${azurerm_resource_group.hashicluster.location}"
   upgrade_policy_mode = "Manual"
 
   sku {
+    capacity = "${var.cluster_vm_count}"
     name = "${var.cluster_vm_size}"
     tier = "Standard"
-    capacity = "${var.cluster_vm_count}"
   }
 
   identity = {
     type = "UserAssigned"
-    identity_ids = ["${var.msi_id}"]
+    identity_ids = ["${azurerm_user_assigned_identity.consul-vmss-reader.id}"]
   }
 
   os_profile {
@@ -67,7 +106,7 @@ resource "azurerm_virtual_machine_scale_set" "hashicluster" {
     ip_configuration {
       primary = true
       name = "HashiClusterIPConfiguration"
-      subnet_id = "${var.subnet_id}"
+      subnet_id = "${azurerm_subnet.hashicluster.id}"
     }
   }
 
@@ -84,6 +123,6 @@ resource "azurerm_virtual_machine_scale_set" "hashicluster" {
   }
 
   tags {
-    scaleSetName = "${var.cluster_name}"
+    scaleSetName = "${var.hashiapp}"
   }
 }

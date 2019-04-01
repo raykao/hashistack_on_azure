@@ -21,7 +21,7 @@
     "vault_version": "{{env `VAULT_VERSION`}}",
     "nomad_version": "{{env `NOMAD_VERSION`}}",
 
-    "docker_version_string": "{{env 'DOCKER_VERSION_STRING'}}"
+    "docker_version_string": "{{env `DOCKER_VERSION_STRING`}}"
   },
   "builders": [
     {

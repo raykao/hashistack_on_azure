@@ -2,7 +2,7 @@
 # $DOCKER_VERSION_STRING is injected by packer at build time #
 ##############################################################
 
-sudo apt-get install \
+sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -18,4 +18,4 @@ sudo add-apt-repository \
 
 sudo apt-get update
 
-sudo apt-get install docker-ce=$DOCKER_VERSION_STRING docker-ce-cli=$DOCKER_VERSION_STRING containerd.io
+sudo apt-get install -y docker-ce=$DOCKER_VERSION_STRING docker-ce-cli=$DOCKER_VERSION_STRING containerd.io
