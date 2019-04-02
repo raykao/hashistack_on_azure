@@ -21,7 +21,7 @@ function getVMSSprivateIPAddresses () {
 
   for vmIP in $vmssPrivateIPAddress
   do
-    consulRetryJoin+=' -retry-join="'$vmIP'"'
+    consulRetryJoin+=" -retry-join $vmIP"
   done
 
   echo $consulRetryJoin

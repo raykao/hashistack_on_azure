@@ -4,7 +4,7 @@ terraform {
 
 provider "azurerm" {
   # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
-  version = "=1.21.0"
+  version = "=1.23.0"
 }
 
 locals {
@@ -208,4 +208,12 @@ module "worker_servers" {
   vnet_name = "${azurerm_virtual_network.hashinet.name}"
   vnet_resource_group_name = "${azurerm_resource_group.hashicluster.name}"
   subnet_prefix = "10.1.0.0/17"
+}
+
+# Work around to ensure the DNS/FQDN is assigned and available afer the VM is provisioned
+# See: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1847#issuecomment-417624630
+data "azurerm_public_ip" "jumpbox_server" {
+  depends_on = ["azurerm_virtual_machine.jumpbox_server"]
+  name = "${azurerm_public_ip.jumpbox_server.name}"
+  resource_group_name = "${azurerm_resource_group.jumpbox_server.name}"
 }
