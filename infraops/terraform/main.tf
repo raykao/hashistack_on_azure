@@ -8,14 +8,11 @@ provider "azurerm" {
 }
 
 locals {
-  dns_name = "${random_string.prefix.result}"
+  dns_name = "${random_pet.dns_name.id}"
 }
 
-resource "random_string" "prefix" {
-  length = 8
-  special = false
-  upper = false
-  lower = true
+resource "random_pet" "dns_name" {
+  separator = "-"
 }
 
 
@@ -50,7 +47,7 @@ resource "azurerm_public_ip" "jumpbox_server" {
   resource_group_name = "${azurerm_resource_group.jumpbox_server.name}"
   allocation_method   = "Dynamic"
   idle_timeout_in_minutes = 30
-  domain_name_label = "${local.dns_name}"
+  domain_name_label = "jumpbox-${local.dns_name}"
 
   tags = {
     environment = "${var.CLUSTER_ENVIRONMENT}"
