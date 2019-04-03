@@ -214,22 +214,3 @@ module "worker_servers" {
 #   name = "${azurerm_public_ip.jumpbox_server.name}"
 #   resource_group_name = "${azurerm_resource_group.jumpbox_server.name}"
 # }
-
-resource "azurerm_role_assignment" "consul_cluster_cluster_reader" {
-  scope                = "${data.azurerm_subscription.primary.id}"
-  role_definition_name = "Reader"
-  principal_id         = "${module.consul_servers.msi_principal_id}"
-}
-
-resource "azurerm_role_assignment" "vault_consul_cluster_reader" {
-  scope                = "${data.azurerm_subscription.primary.id}"
-  role_definition_name = "Reader"
-  principal_id         = "${module.vault_servers.msi_principal_id}"
-}
-
-resource "azurerm_role_assignment" "nomad_consul_cluster_reader" {
-  scope                = "${data.azurerm_subscription.primary.id}"
-  role_definition_name = "Reader"
-  principal_id         = "${module.nomad_servers.msi_principal_id}"
-}
-
