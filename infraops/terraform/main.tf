@@ -11,6 +11,9 @@ locals {
   dns_name = "${random_pet.dns_name.id}"
 }
 
+data "azurerm_client_config" "current" {}
+
+
 resource "random_pet" "dns_name" {
   separator = "-"
 }
@@ -20,6 +23,22 @@ resource "azurerm_resource_group" "hashicluster" {
   name     = "hashicluster"
   location = "${var.AZURE_DC_LOCATION}"
 }
+
+resource "azurerm_key_vault" "hashicluster" {
+  name                        = "keyvault-${local.dns_name}"
+  location                    = "${azurerm_resource_group.hashicluster.location}"
+  resource_group_name         = "${azurerm_resource_group.hashicluster.name}"
+  tenant_id                   = "${data.azurerm_client_config.current.tenant_id}"
+
+  sku {
+    name = "standard"
+  }
+
+  tags = {
+    environment = "Production"
+  }
+}
+
 
 resource "azurerm_virtual_network" "hashinet" {
   name                = "hashinetwork"
@@ -214,3 +233,4 @@ module "worker_servers" {
 #   name = "${azurerm_public_ip.jumpbox_server.name}"
 #   resource_group_name = "${azurerm_resource_group.jumpbox_server.name}"
 # }
+
