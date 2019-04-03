@@ -16,9 +16,18 @@ resource "random_string" "msi_name" {
   special = false
 }
 
+resource "random_string" "vault_generated_key_name" {
+  length = 16
+  special = false
+}
+
+
+
 locals {
   auto_generate_key = "${base64encode(random_string.consul_encrypt.result)}"
   consul_encrypt_key = "${var.consul_encrypt_key != "" ? var.consul_encrypt_key : local.auto_generate_key}"
+  vault_generated_key_name = "${var.vault_generated_key_name != "" ? var.vault_generated_key_name : random_string.vault_generated_key_name}"
+  vault_azure_key_vault_name = "${var.vault_azure_key_vault_name}"
 }
 
 
@@ -31,6 +40,8 @@ data "template_file" "hashiconfig" {
     consul_vmss_rg = "${var.consul_vmss_rg}"
     consul_dc_name = "${var.consul_dc_name}"
     consul_encrypt_key = "${local.consul_encrypt_key}"
+    vault_azure_key_vault_name = "${local.vault_azure_key_vault_name}"
+    vault_generated_key_name = "${local.vault_generated_key_name}"
   }
 }
 

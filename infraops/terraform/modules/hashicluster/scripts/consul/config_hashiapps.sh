@@ -7,6 +7,8 @@ export CONSUL_VMSS_NAME="${consul_vmss_name}"
 export CONSUL_VMSS_RG="${consul_vmss_rg}"
 export CONSUL_DC_NAME="${consul_dc_name}"
 export CONSUL_ENCRYPT_KEY="${consul_encrypt_key}"
+export AKV_VAULT_NAME="${vault_azure_key_vault_name}"
+export AKV_KEY_NAME="${vault_generated_key_name}"
 
 ########################
 ### Helper Functions ###

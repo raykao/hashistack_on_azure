@@ -13,3 +13,7 @@ output "consul_encrypt_key" {
 output "msi_principal_id" {
   value = "${azurerm_user_assigned_identity.consul-vmss-reader.principal_id}"
 }
+
+output "subnet_id" {
+  value = "${azurerm_subnet.hashicluster.id}"
+}

@@ -9,6 +9,8 @@ provider "azurerm" {
 
 locals {
   dns_name = "${random_pet.dns_name.id}"
+  vault_generated_key_name = "${resource.random_string.vault_generated_key_name.result}"
+  azure_key_vault_name = "keyvault-${local.dns_name}"
 }
 
 data "azurerm_client_config" "current" {}
@@ -18,6 +20,11 @@ resource "random_pet" "dns_name" {
   separator = "-"
 }
 
+resource "random_string" "vault_generated_key_name" {
+  length = 16
+  special = false
+}
+
 
 resource "azurerm_resource_group" "hashicluster" {
   name     = "hashicluster"
@@ -25,20 +32,27 @@ resource "azurerm_resource_group" "hashicluster" {
 }
 
 resource "azurerm_key_vault" "hashicluster" {
-  name                        = "keyvault-${local.dns_name}"
+  name                        = "${local.azure_key_vault_name}"
   location                    = "${azurerm_resource_group.hashicluster.location}"
   resource_group_name         = "${azurerm_resource_group.hashicluster.name}"
+  enabled_for_deployment      = true
+  enabled_for_disk_encryption = true
   tenant_id                   = "${data.azurerm_client_config.current.tenant_id}"
 
   sku {
     name = "standard"
+  }
+  
+  networkacls {
+    default_action = "Deny"
+    bypass         = "None"
+    virtual_network_subnet_ids = ["${module.vault_servers.subnet_id}"]
   }
 
   tags = {
     environment = "Production"
   }
 }
-
 
 resource "azurerm_virtual_network" "hashinet" {
   name                = "hashinetwork"
@@ -165,6 +179,9 @@ module "vault_servers" {
   consul_vmss_rg = "${var.CONSUL_VMSS_RG}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
 
+  vault_azure_key_vault_name = "${local.azure_key_vault_name}"
+  vault_generated_key_name = "${local.vault_generated_key_name}"
+
   cluster_vm_count = "3"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"
   cluster_vm_image_reference = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
@@ -234,3 +251,38 @@ module "worker_servers" {
 #   resource_group_name = "${azurerm_resource_group.jumpbox_server.name}"
 # }
 
+
+# Access Policies to Azure Key Vault for the Vault Servers - used for Azure Cloud Auto Unseal
+resource "azurerm_key_vault_access_policy" "hashicluster" {
+  vault_name = "${azurerm_key_vault.hashicluster.name}"
+  resource_group_name = "${azurerm_key_vault.hashicluster.resource_group_name}"
+
+  tenant_id = "${data.azurerm_client_config.current.tenant_id}"
+  object_id = "${module.vault_servers.msi_principal_id}"
+
+  key_permissions = [
+    "get",
+    "list",
+    "create",
+    "delete",
+    "update",
+    "wrapKey",
+    "unwrapKey",
+  ]
+}
+
+resource "azurerm_key_vault_key" "generated" {
+  name      = "${local.vault_generated_key_name}"
+  key_vault_id = "${azurerm_key_vault.hashicluster.id}"
+  key_type  = "RSA"
+  key_size  = 2048
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+}

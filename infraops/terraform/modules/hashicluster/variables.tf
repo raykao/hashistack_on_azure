@@ -35,6 +35,17 @@ variable "consul_dc_name" {
   default = "dc1"
 }
 
+variable "vault_generated_key_name" {
+  description = "The auto unseal key name stored in Azure Key Vault"
+  default = ""
+}
+
+variable "vault_azure_key_vault_name" {
+  description = "Required - The Azure Key Vault Name to get the Auto Unseal Key from."
+}
+
+
+
 variable "associate_public_ip_address_load_balancer" {
   description = "Should a load balancer be deployed? Default: Nope."
   default = false
