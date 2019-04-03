@@ -23,7 +23,7 @@ locals {
 
 
 data "template_file" "hashiconfig" {
-  template = "${file("${path.module}/scripts/consul/config_consul_server.sh")}"
+  template = "${file("${path.module}/scripts/consul/config_hashiapps.sh")}"
   vars = {
     is_server = "${var.hashiapp}"    
     azure_subscription_id = "${data.azurerm_subscription.primary.id}"
@@ -59,12 +59,6 @@ resource "azurerm_user_assigned_identity" "consul-vmss-reader" {
   tags = {
     hashi = "vmssreader"
   }
-}
-
-resource "azurerm_role_assignment" "test" {
-  scope                = "${data.azurerm_subscription.primary.id}"
-  role_definition_name = "Reader"
-  principal_id         = "${azurerm_user_assigned_identity.consul-vmss-reader.principal_id}"
 }
 
 resource "azurerm_virtual_machine_scale_set" "hashicluster" {

@@ -18,6 +18,9 @@ HASHIAPP_DATA_PATH=$HASHIAPP_BASE_PATH"/data"
 
 SYSTEMD_PATH="/etc/systemd/system/"
 
+HCLQ_VERSION="0.5.2"
+HCLQ_DOWNLOAD_URL="https://github.com/mattolenik/hclq/releases/download/0.5.2/hclq-linux-amd64/"
+
 echo "Configuring directories for $HASHIAPPNAME"
 
 echo $(sudo mkdir --parents $HASHIAPP_BIN_PATH)
@@ -56,5 +59,12 @@ echo "*****"
 sudo mv "/tmp$HASHIAPP_BIN_PATH/"* $HASHIAPP_BIN_PATH
 
 sudo chown --recursive $HASHIAPP_USER:$HASHIAPP_GROUP $HASHIAPP_BASE_PATH
+
+# Install HCLQ
+echo "*****"
+echo "Installing hclq command line tool for editing HCL files..."
+echo "*****"
+wget -c /usr/local/bin $HCLQ_DOWNLOAD_URL -o hclq
+chmod +x /usr/local/bin/hclq
 
 echo "Done..."

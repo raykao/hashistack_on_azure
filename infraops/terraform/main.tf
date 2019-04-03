@@ -209,8 +209,27 @@ module "worker_servers" {
 
 # Work around to ensure the DNS/FQDN is assigned and available afer the VM is provisioned
 # See: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1847#issuecomment-417624630
-data "azurerm_public_ip" "jumpbox_server" {
-  depends_on = ["azurerm_virtual_machine.jumpbox_server"]
-  name = "${azurerm_public_ip.jumpbox_server.name}"
-  resource_group_name = "${azurerm_resource_group.jumpbox_server.name}"
+# data "azurerm_public_ip" "jumpbox_server" {
+#   depends_on = ["azurerm_virtual_machine.jumpbox_server"]
+#   name = "${azurerm_public_ip.jumpbox_server.name}"
+#   resource_group_name = "${azurerm_resource_group.jumpbox_server.name}"
+# }
+
+resource "azurerm_role_assignment" "consul_cluster_cluster_reader" {
+  scope                = "${data.azurerm_subscription.primary.id}"
+  role_definition_name = "Reader"
+  principal_id         = "${module.consul_servers.msi_principal_id}"
 }
+
+resource "azurerm_role_assignment" "vault_consul_cluster_reader" {
+  scope                = "${data.azurerm_subscription.primary.id}"
+  role_definition_name = "Reader"
+  principal_id         = "${module.vault_servers.msi_principal_id}"
+}
+
+resource "azurerm_role_assignment" "nomad_consul_cluster_reader" {
+  scope                = "${data.azurerm_subscription.primary.id}"
+  role_definition_name = "Reader"
+  principal_id         = "${module.nomad_servers.msi_principal_id}"
+}
+

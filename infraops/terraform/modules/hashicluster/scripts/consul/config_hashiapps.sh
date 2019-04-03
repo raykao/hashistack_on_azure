@@ -2,7 +2,7 @@
 
 # Terraform variables will be "injected" via interpolation and data source configuration in main template
 export IS_SERVER="${is_server}"
-export AZURE_SUBSCRIPTION_ID="${azure_subscription_id}"
+export AZURE_SUBSCRIPTION_ID="${azure_subscription_id}" # gives the full subID with prepended "/subscription/<id>"
 export CONSUL_VMSS_NAME="${consul_vmss_name}"
 export CONSUL_VMSS_RG="${consul_vmss_rg}"
 export CONSUL_DC_NAME="${consul_dc_name}"
@@ -26,6 +26,8 @@ disable_hashiapp() {
 ### Set file permissions and enable service for HashiApp [consul, vault, nomad]
 enable_hashiapp() {
   sudo chown -R $1:$1 /opt/$1
+  sudo chmod -R 750 /opt/$1
+
   sudo systemctl enable $1
   sudo systemctl restart $1
 }
@@ -53,10 +55,9 @@ datacenter = "$CONSUL_DC_NAME"
 encrypt = "$CONSUL_ENCRYPT_KEY"
 data_dir = "/opt/consul/data"
 EOF
+
   enable_hashiapp "consul"
 }
-
-
 #################################
 #### Consul Server specifics ####
 #################################
@@ -66,12 +67,17 @@ configure_consul_server() {
   echo $(disable_hashiapp "nomad")
 
   ## Consul Server Config
-  sudo echo -e "server = true\nbootstrap_expect = 3\nui = true\nconnect {\n  enabled = true \n}" | sudo tee /opt/consul/config/server.hcl
+  sudo cat > /opt/consul/config/server.hcl <<EOF 
+server = true
+bootstrap_expect = 3
+ui = true
+connect {
+    enabled = true 
+}
+EOF
 
   configure_consul_agent
 }
-
-
 ############################
 #### Vault Agent basics ####
 ############################
@@ -79,7 +85,6 @@ configure_vault_agent() {
   configure_consul_agent
   enable_hashiapp "vault"
 }
-
 ################################
 #### Vault Server specifics ####
 ################################
@@ -106,8 +111,6 @@ configure_nomad_server() {
   ## Nomad Server Config
   configure_nomad_agent
 }
-
-
 ###############################
 ### Server or Worker setup ####
 ###############################
