@@ -11,5 +11,5 @@ output "consul_vmss_rg" {
 }
 
 output "jumpbox_dns" {
-  value = "${azurerm_public_ip.jumpbox_server.fqdn}"
+  value = "${module.jumpbox_server.fqdn}"
 }

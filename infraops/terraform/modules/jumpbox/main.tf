@@ -12,9 +12,13 @@ locals {
 resource "azurerm_resource_group" "jumpbox_server" {
   name = "${local.jumpboxname}-server"
   location = "${var.resource_group_location}"
-  tags = {
-    hashi = "jumpbox_server"
-  }
+}
+
+resource "azurerm_subnet" "jumpbox_server" {
+  name           = "${local.jumpboxname}-subnet"
+  virtual_network_name = "${var.virtual_network_name}"
+  resource_group_name  = "${var.virtual_network_resource_group_name}"
+  address_prefix = "${var.subnet_prefix}"
 }
 
 resource "azurerm_public_ip" "jumpbox_server" {
@@ -26,16 +30,8 @@ resource "azurerm_public_ip" "jumpbox_server" {
   domain_name_label = "${local.jumpboxname}"
 }
 
-resource "azurerm_subnet" "jumpbox_server" {
-  name           = "jumpbox-subnet"
-  virtual_network_name = "${var.virtual_network_name}"
-  resource_group_name  = "${var.virtual_network_resource_group_name}"
-  address_prefix = "${var.subnet_prefix}"
-}
-
-
 resource "azurerm_network_interface" "jumpbox_server" {
-  name                = "jumpbox-nic"
+  name                = "${local.jumpboxname}-nic"
   location            = "${azurerm_resource_group.jumpbox_server.location}"
   resource_group_name = "${azurerm_resource_group.jumpbox_server.name}"
 
@@ -68,7 +64,7 @@ resource "azurerm_virtual_machine" "jumpbox_server" {
     managed_disk_type = "Standard_LRS"
   }
   os_profile {
-    computer_name  = "jumpbox001"
+    computer_name  = "${local.jumpboxname}"
     admin_username = "${var.admin_name}"
   }
   os_profile_linux_config {

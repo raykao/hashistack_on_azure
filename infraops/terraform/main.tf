@@ -25,10 +25,6 @@ resource "azurerm_virtual_network" "hashicluster" {
   resource_group_name = "${azurerm_resource_group.hashicluster.name}"
   location            = "${azurerm_resource_group.hashicluster.location}"
   address_space       = ["10.0.0.0/8"]
-
-  tags = {
-    environment = "${var.CLUSTER_ENVIRONMENT}"
-  }
 }
 
 module "jumpbox" {
@@ -45,8 +41,6 @@ module "jumpbox" {
 
   subnet_prefix = "10.0.0.48/29"
 }
-
-
 module "consul_servers" {
   source = "./modules/hashicluster"
   
