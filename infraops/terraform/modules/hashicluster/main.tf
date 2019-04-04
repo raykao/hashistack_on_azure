@@ -34,10 +34,11 @@ locals {
   azure_key_vault_shamir_key_name = "${var.azure_key_vault_shamir_key_name != "" ? var.azure_key_vault_shamir_key_name : random_string.azure_key_vault_shamir_key_name.result}"
   azure_key_vault_name            = "${var.azure_key_vault_name != "" ? var.azure_key_vault_name : random_pet.keyvault.id}"
   key_vault_count                 = "${var.hashiapp == "vault" ? 1 : 0}"
+  vault_service_endpoints         = "${var.hashiapp == "vault" ? "Microsoft.KeyVault" : ""}"
 }
 
 data "template_file" "hashiconfig" {
-  template = "${file("${path.module}/scripts/consul/config_hashiapps.sh")}"
+  template = "${file("${path.module}/scripts/config_hashiapps.sh")}"
   vars = {
     is_server = "${var.hashiapp}"    
     azure_subscription_id = "${data.azurerm_subscription.primary.id}"
@@ -72,17 +73,29 @@ resource "azurerm_key_vault" "hashicluster" {
   }
   
   network_acls {
-    default_action = "Deny"
+    default_action = "Allow"
     bypass         = "AzureServices"
     virtual_network_subnet_ids = ["${azurerm_subnet.hashicluster.id}"]
   }
-
-  tags = {
-    environment = "Production"
-  }
 }
 
-resource "azurerm_key_vault_access_policy" "hashicluster" {
+resource "azurerm_key_vault_access_policy" "terraform_serviceprincipal" {
+  count       = "${local.key_vault_count}"
+  key_vault_id = "${element(azurerm_key_vault.hashicluster.*.id, 0)}"
+  # vault_name = "${element(azurerm_key_vault.hashicluster.*.name, 0)}"
+  # resource_group_name = "${element(azurerm_key_vault.hashicluster.*.resource_group_name, 0)}"
+
+  tenant_id = "${data.azurerm_client_config.current.tenant_id}"
+  object_id = "${data.azurerm_client_config.current.service_principal_object_id}"
+
+  key_permissions = [
+    "get",
+    "create",
+    "delete"
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "vault_cluster" {
   count       = "${local.key_vault_count}"
   key_vault_id = "${element(azurerm_key_vault.hashicluster.*.id, 0)}"
   # vault_name = "${element(azurerm_key_vault.hashicluster.*.name, 0)}"
@@ -125,6 +138,7 @@ resource "azurerm_subnet" "hashicluster" {
   virtual_network_name = "${var.vnet_name}"
   resource_group_name  = "${var.vnet_resource_group_name}"
   address_prefix = "${var.subnet_prefix}"
+  service_endpoints = ["${local.vault_service_endpoints}"]
 }
 
 

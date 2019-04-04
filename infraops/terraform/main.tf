@@ -16,7 +16,7 @@ resource "random_pet" "suffix" {
 }
 
 resource "azurerm_resource_group" "hashicluster" {
-  name     = "hashicluster-${random_pet.suffix}"
+  name     = "hashicluster-${local.suffix}"
   location = "${var.AZURE_DC_LOCATION}"
 }
 
@@ -27,16 +27,17 @@ resource "azurerm_virtual_network" "hashicluster" {
   address_space       = ["10.0.0.0/8"]
 }
 
-module "jumpbox" {
+module "jumpbox_server" {
   source = "./modules/jumpbox"
 
   suffix = "${local.suffix}"
   resource_group_location = "${azurerm_resource_group.hashicluster.location}"
   
-  admin_name = "${var.admin_name}"
+  admin_name = "${var.ADMIN_NAME}"
   ssh_key = "${var.SSH_PUBLIC_KEY}"
   
   virtual_network_name = "${azurerm_virtual_network.hashicluster.name}"
+  virtual_network_resource_group_name = "${azurerm_resource_group.hashicluster.name}"
   virtual_network_resource_group_location = "${azurerm_resource_group.hashicluster.location}"
 
   subnet_prefix = "10.0.0.48/29"

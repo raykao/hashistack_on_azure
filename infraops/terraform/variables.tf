@@ -11,11 +11,11 @@ variable "AZURE_DC_LOCATION" {
 }
 
 variable "CONSUL_VMSS_NAME" {
-  default = "consul-server"
+  default = "consul-servers"
 }
 
 variable "CONSUL_VMSS_RG" {
-  default = "consul-server"
+  default = "consul-servers"
 }
 
 
@@ -29,10 +29,6 @@ variable "CONSUL_SERVER_CLUSTER_VM_SIZE" {
 
 variable "HASHI_MANAGED_VM_IMAGE_NAME" {
   
-}
-
-variable "MSI_ID" {
-  default = ""
 }
 
 variable "ADMIN_NAME" {

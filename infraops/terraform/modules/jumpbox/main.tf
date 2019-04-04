@@ -1,10 +1,11 @@
-resource "random_string" "prefix" {
+resource "random_string" "suffix" {
   length = 8
   special = false
   number = false
 }
 
 locals {
+  suffix = "${var.suffix != "" ? var.suffix : random_string.suffix.result}"
   jumpboxname = "jumpbox-${var.suffix}"
 }
 

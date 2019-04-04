@@ -64,9 +64,9 @@ EOF
 #### Consul Server specifics ####
 #################################
 configure_consul_server() {
-  echo $(disable_hashiapp "vault")
-  echo $(uninstall_docker)
-  echo $(disable_hashiapp "nomad")
+  uninstall_docker
+  disable_hashiapp "vault"
+  disable_hashiapp "nomad"
 
   ## Consul Server Config
   sudo cat > /opt/consul/config/server.hcl <<EOF 
@@ -80,13 +80,7 @@ EOF
 
   configure_consul_agent
 }
-############################
-#### Vault Agent basics ####
-############################
-configure_vault_agent() {
-  configure_consul_agent
-  enable_hashiapp "vault"
-}
+
 ################################
 #### Vault Server specifics ####
 ################################
@@ -94,25 +88,48 @@ configure_vault_server() {
   uninstall_docker
   disable_hashiapp "nomad"
 
-  ## Vault Server Config
-  configure_vault_agent
+  sudo cat > /opt/vault/config/storage.hcl <<EOF
+storage "consul" {
+  address = "127.0.0.1:8500"
+  path    = "vault"
 }
+EOF
+
+  sudo cat > /opt/vault/config/auto_unseal.hcl <<EOF
+seal "azurekeyvault" {
+  tenant_id      = "$AZURE_SUBSCRIPTION_ID"
+  vault_name     = "$AKV_VAULT_NAME"
+  key_name       = "$AKV_KEY_NAME"
+}
+EOF
+  
+  configure_consul_agent
+  enable_hashiapp "vault"
+}
+
+
 ############################
 #### Nomad Agent basics ####
 ############################
 configure_nomad_agent() {
-  configure_vault_agent
+  disable_hashiapp "vault"
+
   enable_hashiapp "nomad"
 }
+
+
 ################################
 #### Nomad Server specifics ####
 ################################
 configure_nomad_server() {
   uninstall_docker
+  disable_hashiapp "vault"
 
   ## Nomad Server Config
-  configure_nomad_agent
+  enable_hashiapp "nomad"
 }
+
+
 ###############################
 ### Server or Worker setup ####
 ###############################
