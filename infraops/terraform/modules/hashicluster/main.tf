@@ -73,7 +73,7 @@ resource "azurerm_key_vault" "hashicluster" {
   
   network_acls {
     default_action = "Deny"
-    bypass         = "None"
+    bypass         = "AzureServices"
     virtual_network_subnet_ids = ["${azurerm_subnet.hashicluster.id}"]
   }
 
