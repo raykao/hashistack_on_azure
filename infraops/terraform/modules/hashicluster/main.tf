@@ -4,6 +4,8 @@ terraform {
 
 data "azurerm_subscription" "primary" {}
 
+data "azurerm_client_config" "current" {}
+
 
 resource "random_string" "consul_encrypt" {
   length = 16
@@ -16,20 +18,23 @@ resource "random_string" "msi_name" {
   special = false
 }
 
-resource "random_string" "vault_generated_key_name" {
+
+resource "random_pet" "keyvault" {
+  prefix = "hashi"
+}
+
+resource "random_string" "azure_key_vault_shamir_key_name" {
   length = 16
   special = false
 }
 
 
-
 locals {
-  auto_generate_key = "${base64encode(random_string.consul_encrypt.result)}"
-  consul_encrypt_key = "${var.consul_encrypt_key != "" ? var.consul_encrypt_key : local.auto_generate_key}"
-  vault_generated_key_name = "${var.vault_generated_key_name != "" ? var.vault_generated_key_name : random_string.vault_generated_key_name}"
-  vault_azure_key_vault_name = "${var.vault_azure_key_vault_name}"
+  consul_encrypt_key              = "${var.consul_encrypt_key != "" ? var.consul_encrypt_key : base64encode(random_string.consul_encrypt.result)}"
+  azure_key_vault_shamir_key_name = "${var.azure_key_vault_shamir_key_name != "" ? var.azure_key_vault_shamir_key_name : random_string.azure_key_vault_shamir_key_name.result}"
+  azure_key_vault_name            = "${var.azure_key_vault_name != "" ? var.azure_key_vault_name : random_pet.keyvault.id}"
+  key_vault_count                 = "${var.hashiapp == "vault" ? 1 : 0}"
 }
-
 
 data "template_file" "hashiconfig" {
   template = "${file("${path.module}/scripts/consul/config_hashiapps.sh")}"
@@ -40,8 +45,8 @@ data "template_file" "hashiconfig" {
     consul_vmss_rg = "${var.consul_vmss_rg}"
     consul_dc_name = "${var.consul_dc_name}"
     consul_encrypt_key = "${local.consul_encrypt_key}"
-    vault_azure_key_vault_name = "${local.vault_azure_key_vault_name}"
-    vault_generated_key_name = "${local.vault_generated_key_name}"
+    azure_key_vault_name = "${local.azure_key_vault_name}"
+    azure_key_vault_shamir_key_name = "${local.azure_key_vault_shamir_key_name}"
   }
 }
 
@@ -52,6 +57,68 @@ resource "azurerm_resource_group" "hashicluster" {
       hashiapp = "${var.hashiapp}"
     }
 }
+
+resource "azurerm_key_vault" "hashicluster" {
+  count                       = "${local.key_vault_count}"
+  name                        = "${local.azure_key_vault_name}"
+  location                    = "${azurerm_resource_group.hashicluster.location}"
+  resource_group_name         = "${azurerm_resource_group.hashicluster.name}"
+  enabled_for_deployment      = true
+  enabled_for_disk_encryption = true
+  tenant_id                   = "${data.azurerm_client_config.current.tenant_id}"
+
+  sku {
+    name = "standard"
+  }
+  
+  network_acls {
+    default_action = "Deny"
+    bypass         = "None"
+    virtual_network_subnet_ids = ["${azurerm_subnet.hashicluster.id}"]
+  }
+
+  tags = {
+    environment = "Production"
+  }
+}
+
+resource "azurerm_key_vault_access_policy" "hashicluster" {
+  count       = "${local.key_vault_count}"
+  key_vault_id = "${element(azurerm_key_vault.hashicluster.*.id, 0)}"
+  # vault_name = "${element(azurerm_key_vault.hashicluster.*.name, 0)}"
+  # resource_group_name = "${element(azurerm_key_vault.hashicluster.*.resource_group_name, 0)}"
+
+  tenant_id = "${data.azurerm_client_config.current.tenant_id}"
+  object_id = "${azurerm_user_assigned_identity.consul-vmss-reader.principal_id}"
+
+  key_permissions = [
+    "get",
+    "list",
+    "create",
+    "delete",
+    "update",
+    "wrapKey",
+    "unwrapKey",
+  ]
+}
+
+resource "azurerm_key_vault_key" "generated" {
+  count     = "${local.key_vault_count}"
+  name      = "${local.azure_key_vault_shamir_key_name}"
+  key_vault_id = "${element(azurerm_key_vault.hashicluster.*.id, 0)}"
+  key_type  = "RSA"
+  key_size  = 2048
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+}
+
 
 resource "azurerm_subnet" "hashicluster" {
   name           = "${var.cluster_name}-subnet"

@@ -46,4 +46,3 @@ variable "SSH_PUBLIC_KEY" {
 variable "CONSUL_ENCRYPT_KEY" {
   default = ""
 }
-
