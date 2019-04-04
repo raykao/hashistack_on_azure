@@ -83,3 +83,16 @@ variable "vnet_resource_group_name" {
 variable "subnet_prefix" {
   description = "Required - subnet address space"
 }
+
+variable "vault_key_shares" {
+  default = "3"
+}
+
+variable "vault_key_threshold" {
+  default = "2"
+}
+
+variable "vault_pgp_keys" {
+  description = "PGP Key locations on the disk path, or keybase names.  Follows this: https://www.vaultproject.io/docs/concepts/pgp-gpg-keybase.html"
+  default = "keybase:raykao,keybase:raykao,keybase:raykao"
+}

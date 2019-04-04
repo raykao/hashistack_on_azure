@@ -82,6 +82,10 @@ module "vault_servers" {
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"
   cluster_vm_image_reference = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
 
+  vault_key_shares = "${var.VAULT_KEY_SHARES}"
+  vault_key_threshold = "${var.VAULT_KEY_THRESHOLD}"
+  vault_pgp_keys = "${var.VAULT_PGP_KEYS}"
+
   admin_user_name = "${var.ADMIN_NAME}"
   ssh_public_key = "${var.SSH_PUBLIC_KEY}"
 

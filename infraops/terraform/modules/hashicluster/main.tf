@@ -48,6 +48,9 @@ data "template_file" "hashiconfig" {
     consul_encrypt_key = "${local.consul_encrypt_key}"
     azure_key_vault_name = "${local.azure_key_vault_name}"
     azure_key_vault_shamir_key_name = "${local.azure_key_vault_shamir_key_name}"
+    vault_key_shares = "${var.vault_key_shares}"
+    vault_key_threshold = "${var.vault_key_threshold}"
+    vault_pgp = "${var.vault_pgp_keys}"
   }
 }
 

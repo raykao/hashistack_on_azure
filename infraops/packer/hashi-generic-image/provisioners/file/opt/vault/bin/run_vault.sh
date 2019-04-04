@@ -10,4 +10,4 @@ listener "tcp" {
 }
 EOF
 
-vault server -config="/opt/vault/config"
+vault server -config=$VAULT_CONFIG_DIR

@@ -3,12 +3,21 @@
 # Terraform variables will be "injected" via interpolation and data source configuration in main template
 export IS_SERVER="${is_server}"
 export AZURE_SUBSCRIPTION_ID="${azure_subscription_id}" # gives the full subID with prepended "/subscription/<id>"
+
 export CONSUL_VMSS_NAME="${consul_vmss_name}"
 export CONSUL_VMSS_RG="${consul_vmss_rg}"
 export CONSUL_DC_NAME="${consul_dc_name}"
 export CONSUL_ENCRYPT_KEY="${consul_encrypt_key}"
+
 export AKV_VAULT_NAME="${azure_key_vault_name}"
 export AKV_KEY_NAME="${azure_key_vault_shamir_key_name}"
+
+export VAULT_KEY_SHARES="${vault_key_shares}"
+export VAULT_KEY_THRESHOLD="${vault_key_threshold}"
+export VAULT_PGP_KEYS="${pgp_keys}"
+
+sudo echo $(whoami) > /opt/whoami
+sudo cat /etc/passwd > /opt/passwd 
 
 ########################
 ### Helper Functions ###
@@ -105,6 +114,11 @@ EOF
   
   configure_consul_agent
   enable_hashiapp "vault"
+
+  sudo vault operator init \
+    -key-shares=$VAULT_KEY_SHARES \
+    -key-threshold=$VAULT_KEY_THRESHOLD \
+    -pgp-keys=$VAULT_PGP_KEYS
 }
 
 
