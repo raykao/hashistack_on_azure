@@ -2,8 +2,10 @@
 Description="HashiCorp Vault - A tool for managing secrets"
 Documentation=https://www.vaultproject.io/docs/
 Requires=network-online.target
+Requires=consul.service
 After=network-online.target
-ConditionFileNotEmpty=/opt/vault/config/vault.hcl
+After=consul.service
+ConditionFileNotEmpty=/opt/vault/config/server.hcl
 
 [Service]
 User=vault
@@ -17,7 +19,7 @@ AmbientCapabilities=CAP_IPC_LOCK
 Capabilities=CAP_IPC_LOCK+ep
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 NoNewPrivileges=yes
-ExecStart=/opt/vault/bin/run_vault.sh
+ExecStart=/usr/local/bin/vault server -config=/opt/vault/config
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
 KillSignal=SIGINT

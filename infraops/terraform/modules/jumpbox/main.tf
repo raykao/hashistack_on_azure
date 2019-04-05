@@ -53,10 +53,8 @@ resource "azurerm_virtual_machine" "jumpbox_server" {
   vm_size               = "Standard_DS1_v2"
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
+    id   = "${var.managed_disk_id}"
+
   }
   storage_os_disk {
     name              = "myosdisk1"

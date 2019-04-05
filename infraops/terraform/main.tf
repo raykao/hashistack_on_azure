@@ -40,6 +40,8 @@ module "jumpbox_server" {
   virtual_network_resource_group_name = "${azurerm_resource_group.hashicluster.name}"
   virtual_network_resource_group_location = "${azurerm_resource_group.hashicluster.location}"
 
+  managed_disk_id = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
+
   subnet_prefix = "10.0.0.48/29"
 }
 module "consul_servers" {

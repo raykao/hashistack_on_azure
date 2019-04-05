@@ -1,18 +1,27 @@
 [Unit]
-Description="HashiCorp Nomad - Easily Deploy Applications at Any Scale"
-Documentation=https://www.nomadproject.io/
-Requires=network-online.target
+Description=Nomad
+Documentation=https://nomadproject.io/docs/
+Wants=network-online.target
 After=network-online.target
-ConditionFileNotEmpty=/opt/nomad/config/nomad.hcl
+
+# When using Nomad with Consul it is not necessary to start Consul first. These
+# lines start Consul before Nomad as an optimization to avoid Nomad logging
+# that Consul is unavailable at startup.
+Requires=consul.service
+After=consul.service
 
 [Service]
-User=nomad
-Group=nomad
-ExecStart=/bin/bash /opt/nomad/bin/run_nomad.sh
-ExecReload=/usr/local/bin/nomad reload
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/nomad agent -config /opt/nomad/config
 KillMode=process
+KillSignal=SIGINT
+LimitNOFILE=infinity
+LimitNPROC=infinity
 Restart=on-failure
-LimitNOFILE=65536
+RestartSec=2
+StartLimitBurst=3
+StartLimitIntervalSec=10
+TasksMax=infinity
 
 [Install]
 WantedBy=multi-user.target

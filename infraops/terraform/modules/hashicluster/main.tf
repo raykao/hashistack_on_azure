@@ -42,6 +42,7 @@ data "template_file" "hashiconfig" {
   vars = {
     is_server = "${var.hashiapp}"    
     azure_subscription_id = "${data.azurerm_subscription.primary.id}"
+    azure_tenant_id = "${data.azurerm_client_config.current.tenant_id}"
     consul_vmss_name = "${var.consul_vmss_name}"
     consul_vmss_rg = "${var.consul_vmss_rg}"
     consul_dc_name = "${var.consul_dc_name}"
@@ -50,7 +51,7 @@ data "template_file" "hashiconfig" {
     azure_key_vault_shamir_key_name = "${local.azure_key_vault_shamir_key_name}"
     vault_key_shares = "${var.vault_key_shares}"
     vault_key_threshold = "${var.vault_key_threshold}"
-    vault_pgp = "${var.vault_pgp_keys}"
+    vault_pgp_keys = "${var.vault_pgp_keys}"
   }
 }
 
@@ -93,8 +94,12 @@ resource "azurerm_key_vault_access_policy" "terraform_serviceprincipal" {
 
   key_permissions = [
     "get",
+    "list",
     "create",
-    "delete"
+    "delete",
+    "update",
+    "wrapKey",
+    "unwrapKey",
   ]
 }
 
@@ -105,7 +110,7 @@ resource "azurerm_key_vault_access_policy" "vault_cluster" {
   # resource_group_name = "${element(azurerm_key_vault.hashicluster.*.resource_group_name, 0)}"
 
   tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-  object_id = "${azurerm_user_assigned_identity.consul-vmss-reader.principal_id}"
+  object_id = "${azurerm_user_assigned_identity.hashiapp_msi.principal_id}"
 
   key_permissions = [
     "get",
@@ -145,7 +150,7 @@ resource "azurerm_subnet" "hashicluster" {
 }
 
 
-resource "azurerm_user_assigned_identity" "consul-vmss-reader" {
+resource "azurerm_user_assigned_identity" "hashiapp_msi" {
   resource_group_name = "${azurerm_resource_group.hashicluster.name}"
   location            = "${azurerm_resource_group.hashicluster.location}"
 
@@ -159,7 +164,7 @@ resource "azurerm_user_assigned_identity" "consul-vmss-reader" {
 resource "azurerm_role_assignment" "test" {
   scope                = "${data.azurerm_subscription.primary.id}"
   role_definition_name = "Reader"
-  principal_id         = "${azurerm_user_assigned_identity.consul-vmss-reader.principal_id}"
+  principal_id         = "${azurerm_user_assigned_identity.hashiapp_msi.principal_id}"
 }
 
 resource "azurerm_virtual_machine_scale_set" "hashicluster" {
@@ -176,7 +181,7 @@ resource "azurerm_virtual_machine_scale_set" "hashicluster" {
 
   identity = {
     type = "UserAssigned"
-    identity_ids = ["${azurerm_user_assigned_identity.consul-vmss-reader.id}"]
+    identity_ids = ["${azurerm_user_assigned_identity.hashiapp_msi.id}"]
   }
 
   os_profile {

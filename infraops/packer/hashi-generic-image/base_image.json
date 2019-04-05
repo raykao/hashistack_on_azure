@@ -1,21 +1,21 @@
 {
   "variables": {
-    "subscription_id": "{{env `AZ_SUBSCRIPTION_ID`}}",
-    "tenant_id": "{{env `AZ_TENANT_ID`}}",
+    "subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
+    "tenant_id": "{{env `ARM_TENANT_ID`}}",
 
-    "client_id" : "{{env `AZ_CLIENT_ID`}}",
-    "client_secret": "{{env `AZ_CLIENT_SECRET`}}",
+    "client_id" : "{{env `ARM_CLIENT_ID`}}",
+    "client_secret": "{{env `ARM_CLIENT_SECRET`}}",
     
-    "managed_image_resource_group_name": "{{env `AZ_PACKER_RESOURCE_GROUP_NAME`}}",
+    "managed_image_resource_group_name": "{{env `ARM_PACKER_RESOURCE_GROUP_NAME`}}",
     
-    "os_type": "{{env `AZ_OS_TYPE`}}",
-    "image_publisher": "{{env `AZ_IMAGE_PUBLISHER`}}",
-    "image_offer": "{{env `AZ_IMAGE_OFFER`}}",
-    "image_sku": "{{env `AZ_IMAGE_SKU`}}",
-    "location": "{{env `AZ_DC_LOCATION`}}",
-    "vm_size": "{{env `AZ_VM_SIZE`}}",
+    "os_type": "{{env `ARM_OS_TYPE`}}",
+    "image_publisher": "{{env `ARM_IMAGE_PUBLISHER`}}",
+    "image_offer": "{{env `ARM_IMAGE_OFFER`}}",
+    "image_sku": "{{env `ARM_IMAGE_SKU`}}",
+    "location": "{{env `ARM_DC_LOCATION`}}",
+    "vm_size": "{{env `ARM_VM_SIZE`}}",
 
-    "dc_name":"{{env `AZ_DC_NAME`}}",
+    "dc_name":"{{env `ARM_DC_NAME`}}",
 
     "consul_version": "{{env `CONSUL_VERSION`}}",
     "vault_version": "{{env `VAULT_VERSION`}}",

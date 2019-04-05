@@ -8,7 +8,7 @@ ConditionFileNotEmpty=/opt/consul/config/consul.hcl
 [Service]
 User=consul
 Group=consul
-ExecStart=/bin/bash /opt/consul/bin/run_consul.sh
+ExecStart=/usr/local/bin/consul -config=/opt/consul/config
 ExecReload=/usr/local/bin/consul reload
 KillMode=process
 Restart=on-failure

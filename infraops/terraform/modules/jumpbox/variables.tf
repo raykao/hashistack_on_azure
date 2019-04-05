@@ -33,3 +33,7 @@ variable "ssh_key" {
   
 }
 
+variable "managed_disk_id" {
+  
+}
+
