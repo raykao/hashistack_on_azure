@@ -142,14 +142,9 @@ EOF
 ############################
 #### Nomad Agent basics ####
 ############################
-configure_nomad_client() {
+configure_nomad_common() {
   disable_hashiapp "vault"
-
-  sudo cat > /opt/nomad/config/client.hcl <<EOF
-client {
-  enabled = true
-}
-EOF
+  configure_consul_agent
 
   sudo cat > /opt/nomad/config/consul.hcl <<EOF
 consul {
@@ -160,12 +155,25 @@ consul {
   server_auto_join    = true
   client_auto_join    = true
 }
-
 EOF
 
-
-  configure_consul_agent
   enable_hashiapp "nomad"
+}
+
+configure_nomad_client() {
+
+  sudo cat > /opt/nomad/config/client.hcl <<EOF
+client {
+  enabled = true
+  server_join {
+    retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$NOMAD_VMSS_RG vm_scale_set=$NOMAD_VMSS_NAME"]
+    retry_max = 10
+    retry_interval = "15s"
+  }
+}
+EOF
+
+  configure_nomad_common
 }
 
 
@@ -174,7 +182,6 @@ EOF
 ################################
 configure_nomad_server() {
   uninstall_docker
-  disable_hashiapp "vault"
 
   ## Nomad Server Config
 
@@ -184,14 +191,13 @@ server {
   bootstrap_expect = 3
   server_join {
     retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$NOMAD_VMSS_RG vm_scale_set=$NOMAD_VMSS_NAME"]
-    retry_max = 3
+    retry_max = 10
     retry_interval = "15s"
   }
 }
 EOF
-
-  configure_consul_agent
-  enable_hashiapp "nomad"
+  
+  configure_nomad_common
 }
 
 
