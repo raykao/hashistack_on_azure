@@ -136,8 +136,8 @@ module "worker_nodes" {
   consul_vmss_rg = "${var.CONSUL_VMSS_RG}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
 
-  nomad_server_vmss_name = "nomad-servers"
-  nomad_server_vmss_rg_name = "nomad-servers"
+  nomad_server_vmss_name = "${module.nomad_servers.cluster_name}"
+  nomad_server_vmss_rg_name = "${module.nomad_servers.cluster_resource_group_name}"
 
   cluster_vm_count = "3"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"

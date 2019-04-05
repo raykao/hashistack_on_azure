@@ -98,8 +98,10 @@ variable "vault_pgp_keys" {
 }
 
 variable "nomad_server_vmss_name" {
+  default = ""
 }
 
 variable "nomad_server_vmss_rg_name" {
+  default = ""
 }
 
