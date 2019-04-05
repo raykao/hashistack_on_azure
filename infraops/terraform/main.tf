@@ -109,6 +109,9 @@ module "nomad_servers" {
   consul_vmss_rg = "${var.CONSUL_VMSS_RG}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
 
+  nomad_server_vmss_name = "nomad-servers"
+  nomad_server_vmss_rg_name = "nomad-servers"
+
   cluster_vm_count = "3"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"
   cluster_vm_image_reference = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
@@ -121,7 +124,7 @@ module "nomad_servers" {
   subnet_prefix = "10.0.0.32/28"
 }
 
-module "worker-nodes" {
+module "worker_nodes" {
   source = "./modules/hashicluster"
   
   hashiapp = "workernode"
@@ -132,6 +135,9 @@ module "worker-nodes" {
   consul_vmss_name = "${var.CONSUL_VMSS_NAME}"
   consul_vmss_rg = "${var.CONSUL_VMSS_RG}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
+
+  nomad_server_vmss_name = "nomad-servers"
+  nomad_server_vmss_rg_name = "nomad-servers"
 
   cluster_vm_count = "3"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"

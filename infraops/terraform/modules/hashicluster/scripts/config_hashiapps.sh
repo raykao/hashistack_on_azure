@@ -16,8 +16,8 @@ export VAULT_KEY_SHARES="${vault_key_shares}"
 export VAULT_KEY_THRESHOLD="${vault_key_threshold}"
 export VAULT_PGP_KEYS="${vault_pgp_keys}"
 
-export NOMAD_VMSS_NAME="${nomad_vmss_name}"
-export NOMAD_VMSS_RG="${nomad_vmss_rg}"
+export NOMAD_SERVER_VMSS_NAME="${nomad_server_vmss_name}"
+export NOMAD_SERVER_VMSS_RG_NAME="${nomad_server_vmss_rg_name}"
 
 export IPADDR="$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')"
 
@@ -166,7 +166,7 @@ configure_nomad_client() {
 client {
   enabled = true
   server_join {
-    retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$NOMAD_VMSS_RG vm_scale_set=$NOMAD_VMSS_NAME"]
+    retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$NOMAD_SERVER_VMSS_RG_NAME vm_scale_set=$NOMAD_SERVER_VMSS_NAME"]
     retry_max = 10
     retry_interval = "15s"
   }
@@ -190,7 +190,7 @@ server {
   enabled          = true
   bootstrap_expect = 3
   server_join {
-    retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$NOMAD_VMSS_RG vm_scale_set=$NOMAD_VMSS_NAME"]
+    retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$NOMAD_SERVER_VMSS_RG_NAME vm_scale_set=$NOMAD_SERVER_VMSS_NAME"]
     retry_max = 10
     retry_interval = "15s"
   }

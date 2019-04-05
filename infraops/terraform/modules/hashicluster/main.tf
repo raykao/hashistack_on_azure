@@ -52,6 +52,8 @@ data "template_file" "hashiconfig" {
     vault_key_shares = "${var.vault_key_shares}"
     vault_key_threshold = "${var.vault_key_threshold}"
     vault_pgp_keys = "${var.vault_pgp_keys}"
+    nomad_server_vmss_name = "${var.nomad_server_vmss_name}"
+    nomad_server_vmss_rg_name = "${var.nomad_server_vmss_rg_name}"
   }
 }
 

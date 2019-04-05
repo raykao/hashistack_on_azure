@@ -17,3 +17,13 @@ output "msi_principal_id" {
 output "subnet_id" {
   value = "${azurerm_subnet.hashicluster.id}"
 }
+
+output "cluster_name" {
+  value = "${azurerm_virtual_machine_scale_set.hashicluster.name}"
+}
+
+output "cluster_resource_group_name" {
+  value = "${azurerm_resource_group.hashicluster.name}"
+}
+
+
