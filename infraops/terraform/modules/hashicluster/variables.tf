@@ -7,13 +7,10 @@ variable "cluster_name" {
   default = "workernode"
 }
 
-variable "resource_group_name" {
-  
+variable "resource_group_name" { 
 }
 
-
-variable "resource_group_location" {
-  
+variable "resource_group_location" { 
 }
 
 variable "consul_vmss_name" {
@@ -28,7 +25,6 @@ variable "consul_encrypt_key" {
   description = "Optional - Supply the initial Consul Gossip Encryption Key or one will be auto generated to bootstrap the cluster.  You can query the Outputs for 'consul_encrypt_key' to get the value."
   default = ""
 }
-
 
 variable "consul_dc_name" {
   description = "The name of the Consul DC being deployed."
@@ -49,7 +45,6 @@ variable "associate_public_ip_address_load_balancer" {
   description = "Should a load balancer be deployed? Default: Nope."
   default = false
 }
-
 
 variable "cluster_vm_count" {
   default = 3
@@ -104,4 +99,3 @@ variable "nomad_server_vmss_name" {
 variable "nomad_server_vmss_rg_name" {
   default = ""
 }
-

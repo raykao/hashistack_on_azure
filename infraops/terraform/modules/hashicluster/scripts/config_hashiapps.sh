@@ -21,8 +21,7 @@ export NOMAD_SERVER_VMSS_RG_NAME="${nomad_server_vmss_rg_name}"
 
 export IPADDR="$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')"
 
-sudo echo $(whoami) > /opt/whoami
-sudo cat /etc/passwd > /opt/passwd 
+export ADMINUSER = "${admin_user_name}"
 
 ########################
 ### Helper Functions ###
@@ -41,6 +40,7 @@ disable_hashiapp() {
 
 ### Set file permissions and enable service for HashiApp [consul, vault, nomad]
 enable_hashiapp() {
+  sudo usermod -aG $1 $ADMINUSER 2>&1 | sudo tee /opt/usermod.txt
   sudo chown -R $1:$1 /opt/$1
   sudo chmod -R 750 /opt/$1
 
@@ -131,6 +131,8 @@ EOF
   configure_consul_agent
   enable_hashiapp "vault"
 
+  sleep 30
+
   sudo vault operator init \
     -address="http://127.0.0.1:8200" \
     -recovery-shares=$VAULT_KEY_SHARES \
@@ -144,7 +146,7 @@ configure_nomad_common() {
   disable_hashiapp "vault"
   configure_consul_agent
 
-  sudo cat > /opt/nomad/config/consul.hcl <<EOF
+  sudo cat > /opt/nomad/config/common.hcl <<EOF
 consul {
   server_service_name = "nomad"
   client_service_name = "nomad-client"
@@ -153,6 +155,8 @@ consul {
   server_auto_join    = true
   client_auto_join    = true
 }
+
+data_dir = "/opt/nomad/data"
 EOF
 
   enable_hashiapp "nomad"

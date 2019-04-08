@@ -54,6 +54,7 @@ data "template_file" "hashiconfig" {
     vault_pgp_keys = "${var.vault_pgp_keys}"
     nomad_server_vmss_name = "${var.nomad_server_vmss_name}"
     nomad_server_vmss_rg_name = "${var.nomad_server_vmss_rg_name}"
+    admin_user_name = "${var.admin_user_name}"
   }
 }
 
