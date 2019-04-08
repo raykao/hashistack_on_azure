@@ -40,7 +40,7 @@ disable_hashiapp() {
 
 ### Set file permissions and enable service for HashiApp [consul, vault, nomad]
 enable_hashiapp() {
-  sudo usermod -aG $1 $ADMINUSER 2>&1 | sudo tee /opt/usermod.txt
+  sudo usermod -aG "$1" "$ADMINUSER" 2>&1 | sudo tee /opt/usermod.txt
   sudo chown -R $1:$1 /opt/$1
   sudo chmod -R 750 /opt/$1
 
