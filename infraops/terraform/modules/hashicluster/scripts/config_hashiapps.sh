@@ -7,7 +7,7 @@ export AZURE_TENANT_ID="${azure_tenant_id}"
 export CONSUL_VMSS_NAME="${consul_vmss_name}"
 export CONSUL_VMSS_RG="${consul_vmss_rg}"
 export CONSUL_DC_NAME="${consul_dc_name}"
-export CONSUL_ENCRYPT_KEY="${consul_encrypt_key}"
+export CONSUL_ENCRYPT_KEY='${consul_encrypt_key}'
 
 export AKV_VAULT_NAME="${azure_key_vault_name}"
 export AKV_KEY_NAME="${azure_key_vault_shamir_key_name}"
@@ -56,6 +56,7 @@ configure_consul_agent() {
   # sudo sed -i "1s/^/AZURE_SUBSCRIPTION_ID='$AZURE_SUBSCRIPTION_ID'\nCONSUL_VMSS_RG='$CONSUL_VMSS_RG'\nCONSUL_VMSS_NAME='$CONSUL_VMSS_NAME'\n/" /opt/consul/bin/run_consul.sh
   
   sudo cat > /tmp/file.txt <<EOF
+HASHIAPP="$IS_SERVER"
 AZURE_SUBSCRIPTION_ID="$AZURE_SUBSCRIPTION_ID"
 CONSUL_VMSS_RG="$CONSUL_VMSS_RG"
 CONSUL_VMSS_NAME="$CONSUL_VMSS_NAME"
@@ -63,14 +64,13 @@ EOF
 
   sudo cat /opt/consul/bin/run_consul.sh >> /tmp/file.txt
 
-  sudo mv /tmp/file.txt /opt/consul/bin/run_consul.sh
+  sudo cp /tmp/file.txt /opt/consul/bin/run_consul.sh
 
   ## Add Consul default settings to all worker and all server types (Consul, Vault, Nomad)
   sudo cat > /opt/consul/config/consul.hcl <<EOF
 datacenter = "$CONSUL_DC_NAME"
 encrypt = "$CONSUL_ENCRYPT_KEY"
 data_dir = "/opt/consul/data"
-retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$CONSUL_VMSS_RG vm_scale_set=$CONSUL_VMSS_NAME"]
 EOF
 
   enable_hashiapp "consul"
@@ -132,12 +132,10 @@ EOF
   enable_hashiapp "vault"
 
   sudo vault operator init \
-    -key-shares=$VAULT_KEY_SHARES \
-    -key-threshold=$VAULT_KEY_THRESHOLD \
-    -pgp-keys=$VAULT_PGP_KEYS 2>&1 | sudo tee /opt/vault_recovery_keys.txt
-  sudo chmod 640 /opt/vault_recovery_keys.txt
+    -address="http://127.0.0.1:8200" \
+    -recovery-shares=$VAULT_KEY_SHARES \
+    -recovery-threshold=$VAULT_KEY_THRESHOLD 2>&1 | sudo tee /opt/vault_recovery_keys.txt
 }
-
 
 ############################
 #### Nomad Agent basics ####
@@ -166,7 +164,6 @@ configure_nomad_client() {
 client {
   enabled = true
   server_join {
-    retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$NOMAD_SERVER_VMSS_RG_NAME vm_scale_set=$NOMAD_SERVER_VMSS_NAME"]
     retry_max = 10
     retry_interval = "15s"
   }
@@ -190,7 +187,6 @@ server {
   enabled          = true
   bootstrap_expect = 3
   server_join {
-    retry_join = ["provider=azure tenant_id=$AZURE_TENANT_ID subscription_id=$AZURE_SUBSCRIPTION_ID resource_group=$NOMAD_SERVER_VMSS_RG_NAME vm_scale_set=$NOMAD_SERVER_VMSS_NAME"]
     retry_max = 10
     retry_interval = "15s"
   }

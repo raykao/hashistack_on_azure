@@ -1,1 +1,0 @@
-data_dir = "/opt/consul/data"

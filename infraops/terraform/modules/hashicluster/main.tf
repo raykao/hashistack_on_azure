@@ -126,6 +126,7 @@ resource "azurerm_key_vault_access_policy" "vault_cluster" {
 }
 
 resource "azurerm_key_vault_key" "generated" {
+  depends_on = ["azurerm_key_vault_access_policy.terraform_serviceprincipal", "azurerm_subnet.hashicluster"]
   count     = "${local.key_vault_count}"
   name      = "${local.azure_key_vault_shamir_key_name}"
   key_vault_id = "${element(azurerm_key_vault.hashicluster.*.id, 0)}"

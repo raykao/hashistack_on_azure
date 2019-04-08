@@ -9,6 +9,19 @@ provider "azurerm" {
 
 locals {
   suffix = "${random_pet.suffix.id}"
+  
+  consul_cluster_name = "consul-servers"
+  consul_rg_name = "consul-servers"
+  vault_cluster_name  = "vault-servers"
+  nomad_cluster_name = "nomad-servers"
+  worker_cluster_name = "worker-nodes"
+
+  vnet_address_space          = "10.0.0.0/8"
+  consul_server_subnet_suffix = "10.0.0.0/28"
+  vault_server_subnet_suffix  = "10.0.0.16/28"
+  nomad_server_subnet_suffix  = "10.0.0.32/28"
+  worker_nodes_subnet_suffix  = "10.1.0.0/17"
+  jumpbox_subnet_prefix       = "10.0.0.48/29"
 }
 
 resource "random_pet" "suffix" {
@@ -24,7 +37,7 @@ resource "azurerm_virtual_network" "hashicluster" {
   name                = "${azurerm_resource_group.hashicluster.name}-network"
   resource_group_name = "${azurerm_resource_group.hashicluster.name}"
   location            = "${azurerm_resource_group.hashicluster.location}"
-  address_space       = ["10.0.0.0/8"]
+  address_space       = ["${local.vnet_address_space}"]
 }
 
 module "jumpbox_server" {
@@ -42,18 +55,18 @@ module "jumpbox_server" {
 
   managed_disk_id = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
 
-  subnet_prefix = "10.0.0.48/29"
+  subnet_prefix = "${local.jumpbox_subnet_prefix}"
 }
 module "consul_servers" {
   source = "./modules/hashicluster"
   
   hashiapp = "consul"
-  cluster_name = "${var.CONSUL_VMSS_NAME}"
-  resource_group_name = "${var.CONSUL_VMSS_RG}"
+  cluster_name = "${local.consul_cluster_name}"
+  resource_group_name = "${local.consul_rg_name}"
   resource_group_location = "${azurerm_resource_group.hashicluster.location}"  
 
-  consul_vmss_name = "${var.CONSUL_VMSS_NAME}"
-  consul_vmss_rg = "${var.CONSUL_VMSS_RG}"
+  consul_vmss_name = "${local.consul_cluster_name}"
+  consul_vmss_rg = "${local.consul_rg_name}"
   consul_encrypt_key = "${var.CONSUL_ENCRYPT_KEY}"
 
   cluster_vm_count = "${var.CONSUL_SERVER_CLUSTER_VM_COUNT}"
@@ -65,7 +78,7 @@ module "consul_servers" {
 
   vnet_name = "${azurerm_virtual_network.hashicluster.name}"
   vnet_resource_group_name = "${azurerm_resource_group.hashicluster.name}"
-  subnet_prefix = "10.0.0.0/28"
+  subnet_prefix = "${local.consul_server_subnet_suffix}"
 }
 
 module "vault_servers" {
@@ -76,8 +89,8 @@ module "vault_servers" {
   resource_group_name = "vault-servers"
   resource_group_location = "${azurerm_resource_group.hashicluster.location}"  
 
-  consul_vmss_name = "${var.CONSUL_VMSS_NAME}"
-  consul_vmss_rg = "${var.CONSUL_VMSS_RG}"
+  consul_vmss_name = "${module.consul_servers.cluster_name}"
+  consul_vmss_rg = "${module.consul_servers.cluster_resource_group_name}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
 
   cluster_vm_count = "3"
@@ -93,7 +106,7 @@ module "vault_servers" {
 
   vnet_name = "${azurerm_virtual_network.hashicluster.name}"
   vnet_resource_group_name = "${azurerm_resource_group.hashicluster.name}"
-  subnet_prefix = "10.0.0.16/28"
+  subnet_prefix = "${local.vault_server_subnet_suffix}"
 }
 
 
@@ -101,16 +114,16 @@ module "nomad_servers" {
   source = "./modules/hashicluster"
   
   hashiapp = "nomad"
-  cluster_name = "nomad-servers"
-  resource_group_name = "nomad-servers"
+  cluster_name = "${local.nomad_cluster_name}"
+  resource_group_name = "${local.nomad_cluster_name}"
   resource_group_location = "${azurerm_resource_group.hashicluster.location}"  
 
-  consul_vmss_name = "${var.CONSUL_VMSS_NAME}"
-  consul_vmss_rg = "${var.CONSUL_VMSS_RG}"
+  consul_vmss_name = "${module.consul_servers.cluster_name}"
+  consul_vmss_rg = "${module.consul_servers.cluster_resource_group_name}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
 
-  nomad_server_vmss_name = "nomad-servers"
-  nomad_server_vmss_rg_name = "nomad-servers"
+  nomad_server_vmss_name = "${local.nomad_cluster_name}"
+  nomad_server_vmss_rg_name = "${local.nomad_cluster_name}"
 
   cluster_vm_count = "3"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"
@@ -121,19 +134,19 @@ module "nomad_servers" {
 
   vnet_name = "${azurerm_virtual_network.hashicluster.name}"
   vnet_resource_group_name = "${azurerm_resource_group.hashicluster.name}"
-  subnet_prefix = "10.0.0.32/28"
+  subnet_prefix = "${local.nomad_server_subnet_suffix}"
 }
 
 module "worker_nodes" {
   source = "./modules/hashicluster"
   
   hashiapp = "workernode"
-  cluster_name = "worker-nodes"
-  resource_group_name = "worker-nodes"
+  cluster_name = "${local.worker_cluster_name}"
+  resource_group_name = "${local.worker_cluster_name}"
   resource_group_location = "${azurerm_resource_group.hashicluster.location}"  
 
-  consul_vmss_name = "${var.CONSUL_VMSS_NAME}"
-  consul_vmss_rg = "${var.CONSUL_VMSS_RG}"
+  consul_vmss_name = "${module.consul_servers.cluster_name}"
+  consul_vmss_rg = "${module.consul_servers.cluster_resource_group_name}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
 
   nomad_server_vmss_name = "${module.nomad_servers.cluster_name}"
@@ -148,5 +161,5 @@ module "worker_nodes" {
 
   vnet_name = "${azurerm_virtual_network.hashicluster.name}"
   vnet_resource_group_name = "${azurerm_resource_group.hashicluster.name}"
-  subnet_prefix = "10.1.0.0/17"
+  subnet_prefix = "${local.worker_nodes_subnet_suffix}"
 }
