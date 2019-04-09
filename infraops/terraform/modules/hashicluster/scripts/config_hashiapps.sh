@@ -103,6 +103,8 @@ acl {
 }
 EOF
 
+  echo "export CONSUL_HTTP_TOKEN='$CONSUL_MASTER_TOKEN'" >> /home/$ADMINUSER/.bashrc
+
   configure_consul_agent
 }
 
