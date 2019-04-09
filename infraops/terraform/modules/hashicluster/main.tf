@@ -16,7 +16,6 @@ resource "random_uuid" "consul_master_token" {
 
 }
 
-
 resource "random_string" "msi_name" {
   length = 8
   number = false
@@ -62,9 +61,6 @@ data "template_file" "hashiconfig" {
     vault_key_shares = "${var.vault_key_shares}"
     vault_key_threshold = "${var.vault_key_threshold}"
     vault_pgp_keys = "${var.vault_pgp_keys}"
-    
-    nomad_server_vmss_name = "${var.nomad_server_vmss_name}"
-    nomad_server_vmss_rg_name = "${var.nomad_server_vmss_rg_name}"
     
     admin_user_name = "${var.admin_user_name}"
   }
@@ -139,6 +135,7 @@ resource "azurerm_key_vault_access_policy" "vault_cluster" {
 }
 
 resource "azurerm_key_vault_key" "generated" {
+  # Ensure the policies are in place before trying to create the key to store auto-unseal keys
   depends_on = ["azurerm_key_vault_access_policy.terraform_serviceprincipal", "azurerm_subnet.hashicluster"]
   count     = "${local.key_vault_count}"
   name      = "${local.azure_key_vault_shamir_key_name}"

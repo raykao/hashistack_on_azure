@@ -17,9 +17,6 @@ export VAULT_KEY_SHARES="${vault_key_shares}"
 export VAULT_KEY_THRESHOLD="${vault_key_threshold}"
 export VAULT_PGP_KEYS="${vault_pgp_keys}"
 
-export NOMAD_SERVER_VMSS_NAME="${nomad_server_vmss_name}"
-export NOMAD_SERVER_VMSS_RG_NAME="${nomad_server_vmss_rg_name}"
-
 export IPADDR="$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')"
 
 export ADMINUSER="${admin_user_name}"

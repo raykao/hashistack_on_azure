@@ -96,11 +96,3 @@ variable "vault_pgp_keys" {
   description = "PGP Key locations on the disk path, or keybase names.  Follows this: https://www.vaultproject.io/docs/concepts/pgp-gpg-keybase.html"
   default = "keybase:raykao,keybase:raykao,keybase:raykao"
 }
-
-variable "nomad_server_vmss_name" {
-  default = ""
-}
-
-variable "nomad_server_vmss_rg_name" {
-  default = ""
-}

@@ -10,11 +10,11 @@ provider "azurerm" {
 locals {
   suffix = "${random_pet.suffix.id}"
   
-  consul_cluster_name = "consul-servers"
-  consul_rg_name = "consul-servers"
-  vault_cluster_name  = "vault-servers"
-  nomad_cluster_name = "nomad-servers"
-  worker_cluster_name = "worker-nodes"
+  consul_cluster_name = "consul-servers-${local.suffix}"
+  consul_rg_name = "consul-servers-${local.suffix}"
+  vault_cluster_name  = "vault-servers-${local.suffix}"
+  nomad_cluster_name = "nomad-servers-${local.suffix}"
+  worker_cluster_name = "worker-nodes-${local.suffix}"
 
   vnet_address_space          = "10.0.0.0/8"
   consul_server_subnet_suffix = "10.0.0.0/28"
@@ -86,8 +86,8 @@ module "vault_servers" {
   source = "./modules/hashicluster"
   
   hashiapp = "vault"
-  cluster_name = "vault-servers"
-  resource_group_name = "vault-servers"
+  cluster_name = "${local.vault_cluster_name}"
+  resource_group_name = "${local.vault_cluster_name}"
   resource_group_location = "${azurerm_resource_group.hashicluster.location}"  
 
   consul_vmss_name = "${module.consul_servers.cluster_name}"
@@ -123,9 +123,6 @@ module "nomad_servers" {
   consul_vmss_rg = "${module.consul_servers.cluster_resource_group_name}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
 
-  nomad_server_vmss_name = "${local.nomad_cluster_name}"
-  nomad_server_vmss_rg_name = "${local.nomad_cluster_name}"
-
   cluster_vm_count = "3"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"
   cluster_vm_image_reference = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
@@ -149,9 +146,6 @@ module "worker_nodes" {
   consul_vmss_name = "${module.consul_servers.cluster_name}"
   consul_vmss_rg = "${module.consul_servers.cluster_resource_group_name}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
-
-  nomad_server_vmss_name = "${module.nomad_servers.cluster_name}"
-  nomad_server_vmss_rg_name = "${module.nomad_servers.cluster_resource_group_name}"
 
   cluster_vm_count = "3"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"
