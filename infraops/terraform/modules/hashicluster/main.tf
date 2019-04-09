@@ -36,7 +36,7 @@ resource "random_string" "azure_key_vault_shamir_key_name" {
 
 locals {
   consul_encrypt_key              = "${var.consul_encrypt_key != "" ? var.consul_encrypt_key : base64encode(random_string.consul_encrypt.result)}"
-  consul_master_token               = "${var.consul_master_token !="" ? var.consul_master_token : random_uuid.consul_master_token.result}"
+  consul_master_token               = "${var.consul_master_token != "" ? var.consul_master_token : random_uuid.consul_master_token.result}"
   azure_key_vault_shamir_key_name = "${var.azure_key_vault_shamir_key_name != "" ? var.azure_key_vault_shamir_key_name : random_string.azure_key_vault_shamir_key_name.result}"
   azure_key_vault_name            = "${var.azure_key_vault_name != "" ? var.azure_key_vault_name : random_pet.keyvault.id}"
   key_vault_count                 = "${var.hashiapp == "vault" ? 1 : 0}"

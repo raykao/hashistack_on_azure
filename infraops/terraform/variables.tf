@@ -18,6 +18,11 @@ variable "CONSUL_VMSS_RG" {
   default = "consul-servers"
 }
 
+variable "CONSUL_MASTER_TOKEN" {
+  default = ""
+}
+
+
 
 variable "CONSUL_SERVER_CLUSTER_VM_COUNT" {
   default = 3

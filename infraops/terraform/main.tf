@@ -68,6 +68,7 @@ module "consul_servers" {
   consul_vmss_name = "${local.consul_cluster_name}"
   consul_vmss_rg = "${local.consul_rg_name}"
   consul_encrypt_key = "${var.CONSUL_ENCRYPT_KEY}"
+  consul_master_token = "${var.CONSUL_MASTER_TOKEN}"
 
   cluster_vm_count = "${var.CONSUL_SERVER_CLUSTER_VM_COUNT}"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"

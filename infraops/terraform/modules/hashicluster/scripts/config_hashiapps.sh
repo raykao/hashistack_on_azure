@@ -22,7 +22,7 @@ export NOMAD_SERVER_VMSS_RG_NAME="${nomad_server_vmss_rg_name}"
 
 export IPADDR="$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')"
 
-export ADMINUSER = "${admin_user_name}"
+export ADMINUSER="${admin_user_name}"
 
 ########################
 ### Helper Functions ###
