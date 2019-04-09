@@ -73,6 +73,7 @@ EOF
 
   enable_hashiapp "consul"
 }
+
 #################################
 #### Consul Server specifics ####
 #################################
@@ -90,6 +91,18 @@ connect {
     enabled = true 
 }
 EOF
+
+sudo cat > /opt/consul/config/acl.hcl <<EOF 
+acl {
+  enabled = true
+  default_policy = "deny"
+  down_policy = "extend-cache"
+  tokens {
+    master = "$CONSUL_MASTER_TOKEN"
+  }
+}
+EOF
+  echo "export CONSUL_HTTP_TOKEN='$CONSUL_MASTER_TOKEN'" >> /home/$ADMINUSER/.bashrc
 
   configure_consul_agent
 }
