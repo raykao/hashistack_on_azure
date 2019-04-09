@@ -26,8 +26,11 @@ export ADMINUSER="${admin_user_name}"
 ########################
 ### For non-worker nodes (Consul, Vault or Nomad Masters Control Servers) - remove docker.  Called in respective $hashiapp-server functions
 uninstall_docker() {
-  sudo apt-get purge docker-ce || true
-  sudo rm -rf /var/lib/docker || true
+  sudo apt-get purge -y docker-ce
+  sudo rm -rf /var/lib/docker
+  sudo groupdel docker
+  sudo rm -rf /var/run/docker.sock
+  sudo rm /usr/bin/docker
 }
 
 ### Remove the hashiapps not required for respective server types (e.g. Consul doesn't need vault or nomad agents installed)
