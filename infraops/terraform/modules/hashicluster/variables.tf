@@ -26,6 +26,11 @@ variable "consul_encrypt_key" {
   default = ""
 }
 
+variable "consul_master_token" {
+  default = ""
+}
+
+
 variable "consul_dc_name" {
   description = "The name of the Consul DC being deployed."
   default = "dc1"

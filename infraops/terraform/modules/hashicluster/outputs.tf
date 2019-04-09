@@ -10,6 +10,11 @@ output "consul_encrypt_key" {
   value = "${local.consul_encrypt_key}"
 }
 
+output "consul_master_token" {
+  value = "${var.hashiapp == "consul" ? local.consul_master_token : ""}"
+}
+
+
 output "msi_principal_id" {
   value = "${azurerm_user_assigned_identity.hashiapp_msi.principal_id}"
 }

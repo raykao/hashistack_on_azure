@@ -12,6 +12,11 @@ resource "random_string" "consul_encrypt" {
   special = false
 }
 
+resource "random_uuid" "consul_master_token" {
+
+}
+
+
 resource "random_string" "msi_name" {
   length = 8
   number = false
@@ -31,6 +36,7 @@ resource "random_string" "azure_key_vault_shamir_key_name" {
 
 locals {
   consul_encrypt_key              = "${var.consul_encrypt_key != "" ? var.consul_encrypt_key : base64encode(random_string.consul_encrypt.result)}"
+  consul_master_token               = "${var.consul_master_token !="" ? var.consul_master_token : random_uuid.consul_master_token.result}"
   azure_key_vault_shamir_key_name = "${var.azure_key_vault_shamir_key_name != "" ? var.azure_key_vault_shamir_key_name : random_string.azure_key_vault_shamir_key_name.result}"
   azure_key_vault_name            = "${var.azure_key_vault_name != "" ? var.azure_key_vault_name : random_pet.keyvault.id}"
   key_vault_count                 = "${var.hashiapp == "vault" ? 1 : 0}"
@@ -43,17 +49,23 @@ data "template_file" "hashiconfig" {
     is_server = "${var.hashiapp}"    
     azure_subscription_id = "${data.azurerm_subscription.primary.id}"
     azure_tenant_id = "${data.azurerm_client_config.current.tenant_id}"
+    
     consul_vmss_name = "${var.consul_vmss_name}"
     consul_vmss_rg = "${var.consul_vmss_rg}"
     consul_dc_name = "${var.consul_dc_name}"
     consul_encrypt_key = "${local.consul_encrypt_key}"
+    consul_master_token = "${local.consul_master_token}"
+
     azure_key_vault_name = "${local.azure_key_vault_name}"
     azure_key_vault_shamir_key_name = "${local.azure_key_vault_shamir_key_name}"
+    
     vault_key_shares = "${var.vault_key_shares}"
     vault_key_threshold = "${var.vault_key_threshold}"
     vault_pgp_keys = "${var.vault_pgp_keys}"
+    
     nomad_server_vmss_name = "${var.nomad_server_vmss_name}"
     nomad_server_vmss_rg_name = "${var.nomad_server_vmss_rg_name}"
+    
     admin_user_name = "${var.admin_user_name}"
   }
 }

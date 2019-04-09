@@ -8,6 +8,7 @@ export CONSUL_VMSS_NAME="${consul_vmss_name}"
 export CONSUL_VMSS_RG="${consul_vmss_rg}"
 export CONSUL_DC_NAME="${consul_dc_name}"
 export CONSUL_ENCRYPT_KEY='${consul_encrypt_key}'
+export CONSUL_MASTER_TOKEN="${consul_master_token}"
 
 export AKV_VAULT_NAME="${azure_key_vault_name}"
 export AKV_KEY_NAME="${azure_key_vault_shamir_key_name}"
@@ -90,6 +91,15 @@ bootstrap_expect = 3
 ui = true
 connect {
     enabled = true 
+}
+
+acl {
+  enabled = true
+  default_policy = "deny"
+  down_policy = "extend-cache"
+  tokens {
+    master = "$CONSUL_MASTER_TOKEN"
+  }
 }
 EOF
 
