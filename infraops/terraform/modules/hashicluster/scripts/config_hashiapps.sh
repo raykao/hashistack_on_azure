@@ -68,6 +68,9 @@ EOF
   sudo cat > /opt/consul/config/consul.hcl <<EOF
 datacenter = "$CONSUL_DC_NAME"
 encrypt = "$CONSUL_ENCRYPT_KEY"
+encrypt_verify_incoming = true
+encrypt_verify_outgoing = true
+
 data_dir = "/opt/consul/data"
 EOF
 
@@ -85,7 +88,7 @@ configure_consul_server() {
   sudo cat > /opt/consul/config/server.hcl <<EOF 
 server = true
 bootstrap_expect = 3
-ui = true
+ui = false
 connect {
     enabled = true 
 }
