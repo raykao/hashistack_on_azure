@@ -89,7 +89,7 @@ configure_consul_server() {
   sudo cat > /opt/consul/config/server.hcl <<EOF 
 server = true
 bootstrap_expect = 3
-ui = true
+ui = false
 connect {
     enabled = true 
 }
