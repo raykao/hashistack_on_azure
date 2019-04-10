@@ -34,3 +34,4 @@ This repository is used as a learning guide to deploy an opinionated Hashicorp t
     - Solution: 
       - (1) Use PGP Keys (keybase) to encrypt each key to an admin and save it to a blob storage account where the MSI has write-only access
       - (2) save it to an AKV where the MSI has write-only access and admins can read from the store
+- Task: How do we pass the initial Management Token to Vault?

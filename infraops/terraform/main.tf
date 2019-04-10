@@ -93,6 +93,7 @@ module "vault_servers" {
   consul_vmss_name = "${module.consul_servers.cluster_name}"
   consul_vmss_rg = "${module.consul_servers.cluster_resource_group_name}"
   consul_encrypt_key = "${module.consul_servers.consul_encrypt_key}"
+  consul_master_token = "${module.consul_servers.consul_master_token}"
 
   cluster_vm_count = "3"
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"

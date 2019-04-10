@@ -7,3 +7,4 @@ tfplan
 *.zip
 .env
 .tmp
+.vscode

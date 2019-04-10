@@ -1,1 +1,1 @@
-HASHI_MANAGED_VM_IMAGE_NAME = "/subscriptions/40545cc3-81f4-42c9-953d-67534438918e/resourceGroups/packermanagedvmimages/providers/Microsoft.Compute/images/hashicorpimage-2019-04-10T12-47-10Z"
+HASHI_MANAGED_VM_IMAGE_NAME = "/subscriptions/<subscription_id>/resourceGroups/<resource_group_name>/providers/Microsoft.Compute/images/<image_id>"
