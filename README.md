@@ -32,6 +32,5 @@ This repository is used as a learning guide to deploy an opinionated Hashicorp t
     - Solution: Use Terraform to define the cluster and deploy VMSS and base Azure Services
 - Task: How do we securely save/store the initial Consul Recovery Keys and Root Token?
     - Solution: 
-      - (1) save it to a blob storage account where the MSI has write-only access
-      - (2) save it to an AKV where the MSI has write-only access
-      - (3) use something like Keybase to send a GPG encrypted message to a user/admin??
+      - (1) Use PGP Keys (keybase) to encrypt each key to an admin and save it to a blob storage account where the MSI has write-only access
+      - (2) save it to an AKV where the MSI has write-only access and admins can read from the store
