@@ -137,7 +137,28 @@ EOF
   sudo vault operator init \
     -address="http://127.0.0.1:8200" \
     -recovery-shares=$VAULT_KEY_SHARES \
-    -recovery-threshold=$VAULT_KEY_THRESHOLD 2>&1 | sudo tee /opt/vault_recovery_keys.txt
+    -recovery-threshold=$VAULT_KEY_THRESHOLD \
+    -recovery-pgp-keys=$VAULT_PGP_KEYS 2>&1 | sudo tee /opt/vault_recovery_keys.txt
+
+export RECOVERY_KEYS=($(head -n -5 /opt/vault_recovery_keys.txt | awk '{ print $4 }'))
+export token=$${RECOVERY_KEYS[-1]}
+export users=()
+
+unset 'RECOVERY_KEYS[$${#RECOVERY_KEYS[@]}-1]'
+
+OLDIFS=$IFS
+IFS=","
+keybase=($VAULT_PGP_KEYS)
+IFS=$OLDIFS
+
+for index in "$${!keybase[@]}"; do
+  users+=($(echo $${keybase[index]} | awk -F: '{print $2}'))
+done
+
+for index in "$${!RECOVERY_KEYS[@]}"; do
+    echo "$${users[$index]}: $${RECOVERY_KEYS[$index]}" >> /opt/vault_recovery_keys2.txt
+done
+
 }
 
 ############################

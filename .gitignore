@@ -6,3 +6,4 @@
 tfplan
 *.zip
 .env
+.tmp/

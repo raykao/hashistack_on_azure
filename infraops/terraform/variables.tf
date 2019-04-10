@@ -49,14 +49,14 @@ variable "CONSUL_ENCRYPT_KEY" {
 }
 
 variable "VAULT_KEY_SHARES" {
-  default = "3"
+  default = "5"
 }
 
 variable "VAULT_KEY_THRESHOLD" {
-  default = "2"
+  default = "3"
 }
 
 variable "VAULT_PGP_KEYS" {
   description = "PGP Key locations on the disk path, or keybase names.  Follows this: https://www.vaultproject.io/docs/concepts/pgp-gpg-keybase.html"
-  default = "keybase:raykao,keybase:raykao,keybase:raykao"
+  default = "keybase:raykao,keybase:raykao,keybase:raykao,keybase:raykao,keybase:raykao"
 }

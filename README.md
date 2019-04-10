@@ -30,3 +30,8 @@ This repository is used as a learning guide to deploy an opinionated Hashicorp t
     - Solution: Use Hashicorp Packer to generate a baseline "Gold" VM image with all the binaries/tools (Consul, Vault, Nomad, Docker, jq), base config files and systemd service files pre-installed for faster deployment
 - Task: Declaratively deploy infrastructure and provision cluster
     - Solution: Use Terraform to define the cluster and deploy VMSS and base Azure Services
+- Task: How do we securely save/store the initial Consul Recovery Keys and Root Token?
+    - Solution: 
+      - (1) save it to a blob storage account where the MSI has write-only access
+      - (2) save it to an AKV where the MSI has write-only access
+      - (3) use something like Keybase to send a GPG encrypted message to a user/admin??
