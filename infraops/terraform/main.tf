@@ -57,6 +57,7 @@ module "jumpbox_server" {
 
   subnet_prefix = "${local.jumpbox_subnet_prefix}"
 }
+
 module "consul_servers" {
   source = "./modules/hashicluster"
   
@@ -110,7 +111,6 @@ module "vault_servers" {
   vnet_resource_group_name = "${azurerm_resource_group.hashicluster.name}"
   subnet_prefix = "${local.vault_server_subnet_suffix}"
 }
-
 
 module "nomad_servers" {
   source = "./modules/hashicluster"
