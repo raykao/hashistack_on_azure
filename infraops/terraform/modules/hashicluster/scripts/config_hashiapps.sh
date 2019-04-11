@@ -199,9 +199,9 @@ sudo vault write consul/config/access \
 
 }
 
-############################
-#### Nomad Agent basics ####
-############################
+###############################
+#### Nomad Common Settings ####
+###############################
 configure_nomad_common() {
   disable_hashiapp "vault"
   configure_consul_agent
@@ -222,6 +222,10 @@ EOF
   enable_hashiapp "nomad"
 }
 
+####################################
+#### Nomad Client ONLY settings ####
+####################################
+
 configure_nomad_client() {
 
   sudo cat > /opt/nomad/config/client.hcl <<EOF
@@ -238,9 +242,9 @@ EOF
 }
 
 
-################################
-#### Nomad Server specifics ####
-################################
+####################################
+#### Nomad Server ONLY settings ####
+####################################
 configure_nomad_server() {
   uninstall_docker
 

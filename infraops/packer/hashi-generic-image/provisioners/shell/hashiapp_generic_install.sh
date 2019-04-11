@@ -21,6 +21,9 @@ SYSTEMD_PATH="/etc/systemd/system/"
 HCLQ_VERSION="0.5.2"
 HCLQ_DOWNLOAD_URL="https://github.com/mattolenik/hclq/releases/download/0.5.2/hclq-linux-amd64/"
 
+CONSUL_TEMPLATE_ZIP_FILE="consul-template_"$CONSUL_TEMPLATE_VERSION"_linux_amd64.zip"
+CONSUL_TEMPLATE_URL="https://releases.hashicorp.com/consul-template/"$CONSUL_TEMPLATE_VERSION"/"$CONSUL_TEMPLATE_ZIP_FILE
+
 echo "Configuring directories for $HASHIAPPNAME"
 
 echo $(sudo mkdir --parents $HASHIAPP_BIN_PATH)
@@ -66,5 +69,13 @@ echo "Installing hclq command line tool for editing HCL files..."
 echo "*****"
 wget -c /usr/local/bin $HCLQ_DOWNLOAD_URL -o hclq
 chmod +x /usr/local/bin/hclq
+
+# Install Consul Template
+echo "*****"
+echo "Installing Consul Template..."
+echo "*****"
+wget -c /tmp $CONSUL_TEMPLATE_URL -o consul_template.zip
+unzip /tmp/consul_template.zip
+mv consul-template /usr/local/bin/
 
 echo "Done..."
