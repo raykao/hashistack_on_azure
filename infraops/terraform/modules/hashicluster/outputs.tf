@@ -7,10 +7,12 @@ output "consul_vmss_rg" {
 }
 
 output "consul_encrypt_key" {
+  description = "Consul Gossip Encryption Key"
   value = "${local.consul_encrypt_key}"
 }
 
 output "consul_master_token" {
+  description = "Consul Master ACL Token"
   value = "${var.hashiapp == "consul" ? local.consul_master_token : ""}"
 }
 

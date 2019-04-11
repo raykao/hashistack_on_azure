@@ -1,0 +1,1 @@
+HASHI_MANAGED_VM_IMAGE_NAME = "/subscriptions/<subscription_id>/resourceGroups/<resource_group_name>/providers/Microsoft.Compute/images/<image_id>"

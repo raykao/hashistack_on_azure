@@ -71,7 +71,16 @@ EOF
   sudo cat > /opt/consul/config/consul.hcl <<EOF
 datacenter = "$CONSUL_DC_NAME"
 encrypt = "$CONSUL_ENCRYPT_KEY"
+encrypt_verify_incoming = true
+encrypt_verify_outgoing = true
+
 data_dir = "/opt/consul/data"
+
+acl {
+  enabled = true
+  default_policy = "deny"
+  down_policy = "extend-cache"
+}
 EOF
 
   enable_hashiapp "consul"
@@ -95,17 +104,15 @@ connect {
 }
 EOF
 
-# sudo cat > /opt/consul/config/acl.hcl <<EOF 
-# acl {
-#   enabled = true
-#   default_policy = "deny"
-#   down_policy = "extend-cache"
-#   tokens {
-#     master = "$CONSUL_MASTER_TOKEN"
-#   }
-# }
-# EOF
-  # echo "export CONSUL_HTTP_TOKEN='$CONSUL_MASTER_TOKEN'" >> /home/$ADMINUSER/.bashrc
+sudo cat > /opt/consul/config/acl.hcl <<EOF 
+acl {
+  tokens {
+    master = "$CONSUL_MASTER_TOKEN"
+  }
+}
+EOF
+
+  echo "export CONSUL_HTTP_TOKEN='$CONSUL_MASTER_TOKEN'" >> /home/$ADMINUSER/.bashrc
 
   configure_consul_agent
 }
@@ -114,17 +121,18 @@ EOF
 #### Vault Server specifics ####
 ################################
 configure_vault_server() {
-  uninstall_docker
-  disable_hashiapp "nomad"
+uninstall_docker
+disable_hashiapp "nomad"
 
-  sudo cat > /opt/vault/config/storage.hcl <<EOF
+sudo cat > /opt/vault/config/storage.hcl <<EOF
 storage "consul" {
   address = "127.0.0.1:8500"
   path    = "vault"
+  token = "$CONSUL_MASTER_TOKEN"
 }
 EOF
 
-  sudo cat > /opt/vault/config/auto_unseal.hcl <<EOF
+sudo cat > /opt/vault/config/auto_unseal.hcl <<EOF
 seal "azurekeyvault" {
   tenant_id      = "$AZURE_TENANT_ID"
   vault_name     = "$AKV_VAULT_NAME"
@@ -132,7 +140,7 @@ seal "azurekeyvault" {
 }
 EOF
 
-  sudo cat > /opt/vault/config/server.hcl <<EOF
+sudo cat > /opt/vault/config/server.hcl <<EOF
 listener "tcp" {
   address = "0.0.0.0:8200"
   tls_disable = true
@@ -142,15 +150,47 @@ api_addr = "http://$HOSTNAME:8200"
 cluster_addr = "http://$HOSTNAME:8201"
 EOF
   
-  configure_consul_agent
-  enable_hashiapp "vault"
+configure_consul_agent
+enable_hashiapp "vault"
 
-  sleep 30
+sleep 120
 
-  sudo vault operator init \
-    -address="http://127.0.0.1:8200" \
-    -recovery-shares=$VAULT_KEY_SHARES \
-    -recovery-threshold=$VAULT_KEY_THRESHOLD 2>&1 | sudo tee /opt/vault_recovery_keys.txt
+sudo vault operator init \
+  -address="http://127.0.0.1:8200" \
+  -recovery-shares=$VAULT_KEY_SHARES \
+  -recovery-threshold=$VAULT_KEY_THRESHOLD \
+  -recovery-pgp-keys=$VAULT_PGP_KEYS 2>&1 | sudo tee /opt/vault_recovery_keys.txt
+
+export RECOVERY_KEYS=($(head -n -5 /opt/vault_recovery_keys.txt | awk '{ print $4 }'))
+export VAULT_ROOT_TOKEN=$${RECOVERY_KEYS[-1]}
+export users=()
+
+unset 'RECOVERY_KEYS[$${#RECOVERY_KEYS[@]}-1]'
+
+rm /opt/vault_recovery_keys.txt
+
+sudo echo "export VAULT_ADDR='http://127.0.0.1:8200'" >> /home/$ADMINUSER/.bashrc
+sudo echo "export VAULT_TOKEN='$VAULT_ROOT_TOKEN'" >> /home/$ADMINUSER/.bashrc
+
+OLDIFS=$IFS
+IFS=","
+keybase=($VAULT_PGP_KEYS)
+IFS=$OLDIFS
+
+for index in "$${!keybase[@]}"; do
+  users+=($(echo $${keybase[index]} | awk -F: '{print $2}'))
+done
+
+for index in "$${!RECOVERY_KEYS[@]}"; do
+  echo "$${users[$index]}: $${RECOVERY_KEYS[$index]}" >> /opt/vault_recovery_keys.txt
+done
+
+Setup Consul Secrets Backend/Engine
+sudo vault secrets enable consul
+sudo vault write consul/config/access \
+  -address="127.0.0.1:8500" \
+  -token=$CONSUL_MASTER_TOKEN
+
 }
 
 ############################
