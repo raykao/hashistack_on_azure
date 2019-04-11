@@ -128,6 +128,8 @@ module "nomad_servers" {
   cluster_vm_size = "${var.CONSUL_SERVER_CLUSTER_VM_SIZE}"
   cluster_vm_image_reference = "${var.HASHI_MANAGED_VM_IMAGE_NAME}"
 
+  nomad_encrypt_key = "${var.NOMAD_ENCRYPT_KEY}"
+
   admin_user_name = "${var.ADMIN_NAME}"
   ssh_public_key = "${var.SSH_PUBLIC_KEY}"
 

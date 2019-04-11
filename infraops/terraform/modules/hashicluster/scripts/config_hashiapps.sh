@@ -17,6 +17,8 @@ export VAULT_KEY_SHARES="${vault_key_shares}"
 export VAULT_KEY_THRESHOLD="${vault_key_threshold}"
 export VAULT_PGP_KEYS="${vault_pgp_keys}"
 
+export NOMAD_ENCRYPT_KEY="${nomad_encrypt_key}"
+
 export IPADDR="$(ip addr show eth0 | grep -Po 'inet \K[\d.]+')"
 
 export ADMINUSER="${admin_user_name}"
@@ -80,6 +82,7 @@ acl {
   enabled = true
   default_policy = "deny"
   down_policy = "extend-cache"
+  enable_token_persistence = true
 }
 EOF
 
@@ -244,6 +247,7 @@ configure_nomad_server() {
 server {
   enabled          = true
   bootstrap_expect = 3
+  encrypt = "$NOMAD_ENCRYPT_KEY"
   server_join {
     retry_max = 10
     retry_interval = "15s"

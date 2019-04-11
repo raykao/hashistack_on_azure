@@ -11,6 +11,10 @@ resource "random_string" "consul_encrypt" {
   length = 16
   special = false
 }
+resource "random_string" "nomad_encrypt" {
+  length = 16
+  special = false
+}
 
 resource "random_uuid" "consul_master_token" {
 
@@ -40,6 +44,7 @@ locals {
   azure_key_vault_name            = "${var.azure_key_vault_name != "" ? var.azure_key_vault_name : random_pet.keyvault.id}"
   key_vault_count                 = "${var.hashiapp == "vault" ? 1 : 0}"
   vault_service_endpoints         = "${var.hashiapp == "vault" ? "Microsoft.KeyVault" : ""}"
+  nomad_encrypt_key              = "${var.nomad_encrypt_key != "" ? var.nomad_encrypt_key : base64encode(random_string.nomad_encrypt.result)}"
 }
 
 data "template_file" "hashiconfig" {
@@ -61,6 +66,8 @@ data "template_file" "hashiconfig" {
     vault_key_shares = "${var.vault_key_shares}"
     vault_key_threshold = "${var.vault_key_threshold}"
     vault_pgp_keys = "${var.vault_pgp_keys}"
+
+    nomad_encrypt_key = "${local.nomad_encrypt_key}"
     
     admin_user_name = "${var.admin_user_name}"
   }

@@ -33,4 +33,9 @@ output "cluster_resource_group_name" {
   value = "${azurerm_resource_group.hashicluster.name}"
 }
 
+output "nomad_encrypt_key" {
+  value = "${var.hashiapp == "nomad" ? local.nomad_encrypt_key : ""}"
+}
+
+
 

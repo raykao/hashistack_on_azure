@@ -66,3 +66,8 @@ variable "VAULT_PGP_KEYS" {
   description = "PGP Key locations on the disk path, or keybase names.  Follows this: https://www.vaultproject.io/docs/concepts/pgp-gpg-keybase.html"
   default = "keybase:raykao,keybase:raykao,keybase:raykao,keybase:raykao,keybase:raykao"
 }
+
+variable "NOMAD_ENCRYPT_KEY" {
+  description = "Optional - Nomad Encrytion Key for Server to Server Gossip.  One will be auto generated if not supplied."
+  default = ""
+}
