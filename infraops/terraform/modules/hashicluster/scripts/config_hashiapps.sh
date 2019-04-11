@@ -2,8 +2,11 @@
 
 # Terraform variables will be "injected" via interpolation and data source configuration in main template
 export IS_SERVER="${is_server}"
+export CLUSTER_VM_COUNT="${cluster_vm_count}"
+
 export AZURE_SUBSCRIPTION_ID="${azure_subscription_id}" # gives the full subID with prepended "/subscription/<id>"
 export AZURE_TENANT_ID="${azure_tenant_id}"
+
 export CONSUL_VMSS_NAME="${consul_vmss_name}"
 export CONSUL_VMSS_RG="${consul_vmss_rg}"
 export CONSUL_DC_NAME="${consul_dc_name}"
@@ -100,7 +103,7 @@ configure_consul_server() {
   ## Consul Server Config
   sudo cat > /opt/consul/config/server.hcl <<EOF 
 server = true
-bootstrap_expect = 3
+bootstrap_expect = $CLUSTER_VM_COUNT
 ui = false
 connect {
     enabled = true 
@@ -246,7 +249,7 @@ configure_nomad_server() {
   sudo cat > /opt/nomad/config/server.hcl <<EOF
 server {
   enabled          = true
-  bootstrap_expect = 3
+  bootstrap_expect = $CLUSTER_VM_COUNT
   encrypt = "$NOMAD_ENCRYPT_KEY"
   server_join {
     retry_max = 10

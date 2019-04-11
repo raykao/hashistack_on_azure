@@ -50,7 +50,8 @@ locals {
 data "template_file" "hashiconfig" {
   template = "${file("${path.module}/scripts/config_hashiapps.sh")}"
   vars = {
-    is_server = "${var.hashiapp}"    
+    is_server = "${var.hashiapp}"
+    cluster_vm_count = "${var.cluster_vm_count}"
     azure_subscription_id = "${data.azurerm_subscription.primary.id}"
     azure_tenant_id = "${data.azurerm_client_config.current.tenant_id}"
     
