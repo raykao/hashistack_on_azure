@@ -18,10 +18,11 @@
     "dc_name":"{{env `ARM_DC_NAME`}}",
 
     "consul_version": "{{env `CONSUL_VERSION`}}",
+    "consul_template_version": "{{env `CONSUL_TEMPLATE_VERSION`}}",
     "vault_version": "{{env `VAULT_VERSION`}}",
     "nomad_version": "{{env `NOMAD_VERSION`}}",
 
-    "docker_version_string": "{{env `DOCKER_VERSION_STRING`}}"
+    "docker_version": "{{env `DOCKER_VERSION`}}"
   },
   "builders": [
     {
@@ -62,6 +63,9 @@
     },
     {
       "type": "shell",
+      "environment_vars": [
+        "CONSUL_TEMPLATE_VERSION={{user `consul_template_version`}}"
+      ],
       "scripts": [
         "{{template_dir}}/provisioners/shell/00_update_system.sh"
       ]
@@ -99,7 +103,7 @@
     {
       "type": "shell",
       "environment_vars": [
-        "DOCKER_VERSION_STRING={{user `docker_version_string`}}"
+        "DOCKER_VERSION_STRING={{user `docker_version`}}"
       ],
       "scripts": [
         "{{template_dir}}/provisioners/shell/install_docker.sh"

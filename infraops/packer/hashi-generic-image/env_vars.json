@@ -1,6 +1,0 @@
-{
-  "CONSUL_VERSION": "1.4.4",
-  "VAULT_VERSION": "1.1.0",
-  "NOMAD_VERSION": "0.9.0",
-  "DOCKER_VERSION_STRING": "5:18.09.4~3-0~ubuntu-bionic"
-}

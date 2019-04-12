@@ -79,6 +79,8 @@ encrypt = "$CONSUL_ENCRYPT_KEY"
 encrypt_verify_incoming = true
 encrypt_verify_outgoing = true
 
+client_addr="0.0.0.0"
+
 data_dir = "/opt/consul/data"
 
 acl {
