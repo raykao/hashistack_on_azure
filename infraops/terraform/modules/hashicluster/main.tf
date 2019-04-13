@@ -216,7 +216,7 @@ resource "azurerm_virtual_machine_scale_set" "hashicluster" {
 
     ssh_keys {
       path = "/home/${var.admin_user_name}/.ssh/authorized_keys"
-      key_data = "${var.ssh_public_key}"
+      key_data = "${file(var.ssh_public_key)}"
     }
   }
 

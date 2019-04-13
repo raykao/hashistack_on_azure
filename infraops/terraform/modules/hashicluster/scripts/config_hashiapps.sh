@@ -82,14 +82,21 @@ encrypt_verify_outgoing = true
 client_addr="0.0.0.0"
 
 data_dir = "/opt/consul/data"
+EOF
 
+sudo cat > /opt/consul/config/acl.hcl <<EOF 
 acl {
   enabled = true
   default_policy = "deny"
   down_policy = "extend-cache"
   enable_token_persistence = true
+  tokens {
+    master = "$CONSUL_MASTER_TOKEN"
+  }
 }
 EOF
+
+  echo "export CONSUL_HTTP_TOKEN='$CONSUL_MASTER_TOKEN'" >> /home/$ADMINUSER/.bashrc
 
   enable_hashiapp "consul"
 }
@@ -111,16 +118,6 @@ connect {
     enabled = true 
 }
 EOF
-
-sudo cat > /opt/consul/config/acl.hcl <<EOF 
-acl {
-  tokens {
-    master = "$CONSUL_MASTER_TOKEN"
-  }
-}
-EOF
-
-  echo "export CONSUL_HTTP_TOKEN='$CONSUL_MASTER_TOKEN'" >> /home/$ADMINUSER/.bashrc
 
   configure_consul_agent
 }
@@ -190,7 +187,7 @@ for index in "$${!keybase[@]}"; do
 done
 
 for index in "$${!RECOVERY_KEYS[@]}"; do
-  echo "$${users[$index]}: $${RECOVERY_KEYS[$index]}" >> /opt/vault_recovery_keys.txt
+  echo "$${users[$index]}: $${RECOVERY_KEYS[$index]}" >> /home/$ADMINUSER/vault_recovery_keys.txt
 done
 
 Setup Consul Secrets Backend/Engine

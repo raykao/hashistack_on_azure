@@ -70,7 +70,7 @@ resource "azurerm_virtual_machine" "jumpbox_server" {
     disable_password_authentication = true
     ssh_keys = {
       path = "/home/${var.admin_name}/.ssh/authorized_keys"
-      key_data = "${var.ssh_key}"
+      key_data = "${file(var.ssh_public_key)}"
     }
   }
 }

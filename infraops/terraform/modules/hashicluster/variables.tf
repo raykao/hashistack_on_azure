@@ -69,6 +69,7 @@ variable "admin_user_name" {
 
 variable "ssh_public_key" {
   description = "The SSH key to install for the default system admin."
+  default = "~/.ssh/id_rsa.pub"
 }
 
 variable "vnet_name" {

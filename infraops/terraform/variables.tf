@@ -27,6 +27,11 @@ variable "CONSUL_MASTER_TOKEN" {
   default = ""
 }
 
+variable "SSH_KEY" {
+  description = "Optional - Path to ssh public key."
+  default = "~/.ssh/id_rsa.pub"
+}
+
 
 
 variable "CONSUL_SERVER_CLUSTER_VM_COUNT" {

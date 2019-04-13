@@ -29,8 +29,9 @@ variable "admin_name" {
   
 }
 
-variable "ssh_key" {
-  
+variable "ssh_public_key" {
+  description = "Optional - SSH Public Key used for...ssh."
+  default = "~/.ssh/id_rsa.pub"
 }
 
 variable "managed_disk_id" {
