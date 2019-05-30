@@ -13,6 +13,7 @@ HASHIAPP_BASE_PATH="/opt/$HASHIAPPNAME"
 HASHIAPP_BIN_PATH=$HASHIAPP_BASE_PATH"/bin"
 HASHIAPP_CONFIG_PATH=$HASHIAPP_BASE_PATH"/config"
 HASHIAPP_DATA_PATH=$HASHIAPP_BASE_PATH"/data"
+HASHIAPP_PLUGINS_PATH=$HASHIAPP_BASE_PATH"/plugins"
 
 SYSTEMD_PATH="/etc/systemd/system/"
 
@@ -21,6 +22,7 @@ echo "Configuring directories for $HASHIAPPNAME"
 echo $(sudo mkdir --parents $HASHIAPP_BIN_PATH)
 echo $(sudo mkdir --parents $HASHIAPP_CONFIG_PATH)
 echo $(sudo mkdir --parents $HASHIAPP_DATA_PATH)
+echo $(sudo mkdir --parents $HASHIAPP_PLUGINS_PATH)
 
 wget -P $HASHIAPP_DOWNLOAD_PATH $HASHIAPP_DOWNLOAD_URL
 
